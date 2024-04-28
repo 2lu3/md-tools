@@ -1,0 +1,31 @@
+[INPUT]
+psffile         = psf/input.psf       # protein structure file
+reffile         = pdb/start.pdb      # PDB file
+ 
+[OUTPUT]
+comdisfile      = out/target1.dis
+ 
+[TRAJECTORY]
+trjfile1        = out/target0.dcd       # trajectory file
+md_step1        = 100           # number of MD steps
+mdout_period1   = 1             # MD output period
+ana_period1     = 1             # analysis period
+repeat1         = 1
+
+trj_format      = DCD           # (PDB/DCD)
+trj_type        = COOR+BOX      # (COOR/COOR+BOX)
+trj_natom       = 0             # (0:uses reference PDB atom count)
+ 
+[SELECTION]
+group1          = ai:1897 # CA of P3208
+group2          = ai:185 # CA of T3104
+
+group3          = ai:2138       # SG of C
+group4          = ai:84         # SG of C
+
+
+[OPTION]
+check_only      = NO
+allow_backup    = NO
+com_distance1 = 1 2
+com_distance2 = 3 4

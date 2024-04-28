@@ -1,0 +1,16 @@
+import os
+import shutil
+from loguru import logger
+
+def copy_file_safe(source_file: str, output_dir: str, subdir: str, dest_filename: str):
+    if not os.path.exists(source_file):
+        raise FileNotFoundError(f"{source_file} not found")
+
+    dest_dir = os.path.join(output_dir, subdir)
+    os.makedirs(dest_dir, exist_ok=True)
+
+    dest_file = os.path.join(dest_dir, dest_filename)
+    shutil.copy(source_file, dest_file)
+    logger.debug(f"Copy {source_file} to {dest_file}")
+
+

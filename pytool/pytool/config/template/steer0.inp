@@ -1,0 +1,59 @@
+[INPUT]
+topfile             = rtf/top_all36_prot.rtf
+parfile             = prm/par_all36m_prot.prm
+strfile             = str/toppar_water_ions.str
+psffile             = psf/input.psf
+pdbfile             = pdb/start.pdb
+reffile             = pdb/end.pdb
+rstfile             = rst/input.rst
+
+[OUTPUT]
+dcdfile             = out/steer.dcd
+dcdvelfile          = out/steer.dvl
+rstfile             = out/steer.rst
+
+[ENERGY]
+forcefield          = CHARMM    # [CHARMM,AAGO,CAGO,KBGO,AMBER,GROAMBER,GROMARTINI]
+electrostatic       = PME       # [CUTOFF,PME]
+switchdist          = 10.0      # switch distance
+cutoffdist          = 12.0      # cutoff distance
+pairlistdist        = 13.5      # pair-list distance
+vdw_force_switch    = YES       # force switch option for van der Waals
+
+[DYNAMICS]
+integrator          = VVER      # [LEAP,VVER,VRES]
+nsteps              = 600       # number of MD steps
+timestep            = 0.001     # timestep (1fs)
+eneout_period       = 2         # energy output period
+crdout_period       = 2         # coordinates output period
+velout_period       = 2         # velocities output period
+rstout_period       = 100       # restart output period
+nbupdate_period     = 2         # nonbond update period
+steered_md          = YES       # steered MD
+initial_rmsd        = 6.10      # target RMSD value
+final_rmsd          = 0.01      # target RMSD value
+
+[CONSTRAINTS]
+rigid_bond          = YES       # constraints all bonds involving hydrogen
+
+[ENSEMBLE]
+ensemble            = NVT       # [NVE,NVT,NPT,NPAT,NPgT]
+tpcontrol           = BUSSI     # [NO,BERENDSEN,BUSSI,LANGEVIN]
+temperature         = 300.00    # initial and target temperature (K)
+
+[BOUNDARY]
+type                = PBC       # [PBC, NOBC]
+
+[SELECTION]
+group1              = segid: PROA and heavy
+
+[FITTING]
+fitting_method      = TR+ROT    # [NO, TR+ROT, XYTR+ZROT]
+fitting_atom        = 1         # fitted groups
+ 
+[RESTRAINTS]
+nfunctions          = 1         # number of functions
+function1           = RMSD      # restraint function type
+reference1          = 5.00      # initial RMSD value 
+constant1           = 100.0     # force constant
+select_index1       = 1         # restrained groups

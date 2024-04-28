@@ -1,0 +1,29 @@
+[core]
+mode = "xx"
+
+[projects]
+[projects.runner]
+node = 1
+proc = 16
+thread = 3
+
+[projects.benchmark]
+
+[projects.benchmark.runner]
+resources = [
+    [1, 16, 3],
+    [2, 32, 3],
+    [4, 64, 3],
+]
+
+[projects.benchmark]
+
+[projects.xx]
+pdb = "../03_minimization/xx/pdb/input.pdb"
+psf = "../03_minimization/xx/psf/input.psf"
+rst = "../03_minimization/xx/out/min0.rst"
+
+[projects.xx.runner]
+node = 1
+proc = 16
+thread = 3

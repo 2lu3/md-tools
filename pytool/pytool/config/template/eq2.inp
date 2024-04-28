@@ -1,0 +1,43 @@
+[INPUT]
+topfile             = rtf/top_all36_prot.rtf
+parfile             = prm/par_all36m_prot.prm
+strfile             = str/toppar_water_ions.str
+psffile             = psf/input.psf
+pdbfile             = pdb/input.pdb
+reffile             = pdb/input.pdb
+rstfile             = out/eq1.rst
+
+[OUTPUT]
+dcdfile             = out/eq2.dcd
+rstfile             = out/eq2.rst
+
+[ENERGY]
+forcefield          = CHARMM
+electrostatic       = PME
+switchdist          = 10.0
+cutoffdist          = 12.0
+pairlistdist        = 13.5
+vdw_force_switch    = YES
+nonb_limiter        = YES
+
+[DYNAMICS]
+integrator          = VRES
+nsteps              = {{ nsteps }}
+timestep            = 0.0025
+eneout_period       = {{ nsteps // 100 }}
+crdout_period       = {{ nsteps // 100 }}
+rstout_period       = {{ nsteps // 10 }}
+nbupdate_period     = 10
+
+[CONSTRAINTS]
+rigid_bond          = YES
+
+[ENSEMBLE]
+ensemble            = NPT
+tpcontrol           = BUSSI
+temperature         = 300
+pressure            = 1.0
+group_tp            = YES
+
+[BOUNDARY]
+type                = PBC
