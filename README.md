@@ -26,6 +26,22 @@ dvc add --glob "**/*.dvl"
 dvc add --glob "**/*.rst"
 ```
 
+
+.git/hooks/pre-commit
+
+```
+#!/bin/bash
+
+
+# dcd/dvl/rst file should not be staged
+if git diff --cached --name-only | grep -E '\.(dcd|dvl|rst)$'; then
+  echo "エラー: *.dcd, *.dvl, *.rst ファイルがステージされています。"
+  echo "これらのファイルはコミットに含めないでください。"
+  exit 1
+fi
+```
+
+
 ## .env and .envrc
 
 .env
