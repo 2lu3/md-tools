@@ -42,5 +42,7 @@ def get_box_size_to_command(input_pdb: str):
 
     boxsize = get_box_size(u)
 
-    print('dimensions:',boxsize[0])
-    print('atoms:',boxsize[1])
+
+    print(f"{boxsize[0]} {boxsize[1]} {boxsize[2]}")
+
+
