@@ -74,6 +74,8 @@ def clean_directory(output_dir: str, is_delete_output: bool = False):
 
     files = glob.glob(os.path.join(output_dir, "**", "*"), recursive=True)
     for file in files:
+        if not os.path.isfile(file):
+            continue
         if file.endswith(".dvc") or file.endswith(".gitignore"):
             continue
 
