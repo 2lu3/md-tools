@@ -34,7 +34,7 @@ def create_project(project_dir: str, is_clean: bool, extra_keywords: dict = {}):
 
     for i in range(3):
         keywords["index"] = i
-        render2file(f"{project_dir}/inp/eq{i}.inp", f"eq{i}.inp", keywords)
+        render2file(f"{project_dir}/inp/eq{i}.inp", f"eq0.inp", keywords)
         render2file(f"{project_dir}/job{i}.sh", f"job.sh", keywords)
         os.chmod(f"{project_dir}/job{i}.sh", 0o755)
 
