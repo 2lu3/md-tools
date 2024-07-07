@@ -16,14 +16,6 @@ class TemplateRenderer:
         with open(output_path, "w") as f:
             f.write(rendered)
 
-
-def render2file(output_path: str, template_path: str, **params):
-    template_dir = os.path.dirname(template_path)
-
-    env = Environment(loader=FileSystemLoader(template_dir))
-    template = env.get_template(os.path.basename(template_path))
-
-    rendered = template.render(**params)
-
-    with open(output_path, "w") as f:
-        f.write(rendered)
+def render2file(output_path: str, template_path: str, params: dict):
+    renderer = TemplateRenderer(params)
+    renderer.render(template_path, output_path)

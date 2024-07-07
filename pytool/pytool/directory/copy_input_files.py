@@ -8,8 +8,8 @@ from .util import copy_file_safe
 
 
 def copy_toppar_files(
-    output_dir: str,
     toppar_dir: str,
+    output_dir: str,
     files_to_copy: list[tuple[str, str]] = [
         ("rtf", "top_all36_prot.rtf"),
         ("prm", "par_all36m_prot.prm"),
@@ -62,14 +62,14 @@ def copy_structure_files(
         copy_file_safe(rst_file, output_dir, "rst", "input.rst")
 
 
-def clean_directory(output_dir: str, is_clean_output: bool = False):
+def clean_directory(output_dir: str, is_delete_output: bool = False):
     """output_dirを新しいプロジェクトファイルを生成できるように初期化する
 
     - .dvcファイルは削除しない
     - .gitignoreファイルは削除しない
 
     Args:
-        output_dir (str): out/を削除するか(Trueなら削除)
+        is_delete_output (str): out/を削除するか(Trueなら削除)
     """
 
     files = glob.glob(os.path.join(output_dir, "**", "*"), recursive=True)
@@ -77,8 +77,9 @@ def clean_directory(output_dir: str, is_clean_output: bool = False):
         if file.endswith(".dvc") or file.endswith(".gitignore"):
             continue
 
-        if not is_clean_output and file.startswith(os.path.join(output_dir, "out")):
-            continue
+        if file.startswith(os.path.join(output_dir, "out")):
+            if not is_delete_output:
+                continue
 
         os.remove(file)
 
@@ -97,13 +98,7 @@ def init_directory(output_dir: str):
     Args:
         output_dir (str): output_dir
     """
-    if os.path.exists(output_dir):
-        shutil.rmtree(output_dir)
-
-    os.makedirs(output_dir, exist_ok=True)
-    _create_directory(output_dir)
-
-
+    raise NotImplementedError("This function is deprecated. Use clean_directory instead.")
 
 def _create_directory(output_dir: str):
     directories = ["inp", "out", "rtf", "prm", "str", "pdb", "psf", "rst"]

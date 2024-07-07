@@ -1,6 +1,7 @@
 #!/bin/bash
 
 {% raw %}
+pushd $(dirname $0)/project
 
 jobs=($(ls job*.sh | sort -n))
 
@@ -30,4 +31,5 @@ else
         fi
     fi
 fi
+popd
 {% endraw %}
