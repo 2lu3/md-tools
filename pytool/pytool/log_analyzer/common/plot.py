@@ -20,7 +20,6 @@ def plot_2dline(
     x_label: str,
     y_label: str,
     window_size: Optional[int]= None,
-    use_y_log: bool = False,
 ):
     x = read_column_by_name(log_paths, x_name)
     y = read_column_by_name(log_paths, y_name)
@@ -38,8 +37,6 @@ def plot_2dline(
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
     ax.set_title(title)
-    if use_y_log:
-        ax.set_yscale("log")
 
     fig.savefig(output_path)
 
@@ -104,7 +101,7 @@ def plot_total_energy(log_paths: list[str], output_path: str, project_name: str,
         window_size,
     )
     
-def plot_potential_energy(log_paths: list[str], output_path: str, project_name: str, window_size: Optional[int], use_y_log: bool = False,x_name: str = "TIME"):
+def plot_potential_energy(log_paths: list[str], output_path: str, project_name: str, window_size: Optional[int], x_name: str = "TIME"):
     plot_2dline(
         log_paths,
         output_path,
@@ -114,7 +111,6 @@ def plot_potential_energy(log_paths: list[str], output_path: str, project_name: 
         "Time (ps)",
         "Energy (kJ/mol)",
         window_size,
-        use_y_log=use_y_log,
     )
 
 
