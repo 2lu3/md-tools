@@ -10,7 +10,8 @@ def analyze_minimization(log_path: str, filename: str="min",title: str="Minimiza
 
     logger.info(f"Found {len(log_files)} log files")
 
-    plot_potential_energy(log_files, f"energy_{filename}", title, window_size, "STEP")
+    plot_potential_energy(log_files, f"energy_{filename}", title, window_size, x_name="STEP", use_y_log=True)
+
     logger.info(f"Saved Energy")
 
     logger.info(f"Saved all plots")
