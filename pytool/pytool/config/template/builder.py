@@ -12,7 +12,7 @@ import os
 
 def create_project(project_dir: str, is_clean: bool, extra_keywords: dict = {}):
     clean_directory(project_dir, is_clean)
-    copy_toppar_files("../01_data/c36", "project")
+    copy_toppar_files("../01_data/c36", project_dir)
     copy_structure_files(
         output_dir=project_dir,
         pdb_file="../03_minimization/project/pdb/input.pdb",
