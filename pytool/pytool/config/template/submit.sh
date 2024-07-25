@@ -1,7 +1,7 @@
 #!/bin/bash
 
 {% raw %}
-pushd $(dirname $0)/project
+pushd $(dirname $0)
 
 jobs=($(ls job*.sh | sort -n))
 
