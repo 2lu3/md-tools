@@ -38,8 +38,8 @@ def create_project(project_dir: str, is_clean: bool, extra_keywords: dict = {}):
         render2file(f"{project_dir}/job{i}.sh", f"job.sh", keywords)
         os.chmod(f"{project_dir}/job{i}.sh", 0o755)
 
-    render2file("submit.sh", "submit.sh", keywords)
-    os.chmod("submit.sh", 0o755)
+    render2file(f"{project_dir}/submit.sh", "submit.sh", keywords)
+    os.chmod(f"{project_dir}/submit.sh", 0o755)
 
 def create_benchmark():
     nodes = [1, 2, 4, 8]
