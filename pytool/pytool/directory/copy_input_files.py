@@ -102,8 +102,10 @@ def init_directory(output_dir: str):
     """
     raise NotImplementedError("This function is deprecated. Use clean_directory instead.")
 
-def _create_directory(output_dir: str):
+def _create_directory(output_dir: str, addiotinal_dirs: list[str] = []):
     directories = ["inp", "out", "rtf", "prm", "str", "pdb", "psf", "rst"]
+    directories.extend(addiotinal_dirs)
+
     for directory in directories:
         os.makedirs(os.path.join(output_dir, directory), exist_ok=True)
         with open(os.path.join(output_dir, directory, ".gitkeep"), "w"):
