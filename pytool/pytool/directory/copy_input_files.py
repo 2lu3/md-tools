@@ -62,14 +62,16 @@ def copy_structure_files(
         copy_file_safe(rst_file, output_dir, "rst", "input.rst")
 
 
-def clean_directory(output_dir: str, is_delete_output: bool = False):
+def clean_directory(output_dir: str, is_delete_output: bool = False, additional_dirs: list[str] = []):
     """output_dirを新しいプロジェクトファイルを生成できるように初期化する
 
     - .dvcファイルは削除しない
     - .gitignoreファイルは削除しない
 
     Args:
+        output_dir (str): プロジェクトのディレクトリ
         is_delete_output (str): out/を削除するか(Trueなら削除)
+        additional_dirs (list[str]): 追加で生成するディレクトリ
     """
 
     files = glob.glob(os.path.join(output_dir, "**", "*"), recursive=True)
@@ -90,7 +92,7 @@ def clean_directory(output_dir: str, is_delete_output: bool = False):
         if len(dirs) == 0 and len(files) == 0:
             os.rmdir(root)
 
-    _create_directory(output_dir)
+    _create_directory(output_dir, additional_dirs)
 
 
 def init_directory(output_dir: str):
@@ -102,9 +104,9 @@ def init_directory(output_dir: str):
     """
     raise NotImplementedError("This function is deprecated. Use clean_directory instead.")
 
-def _create_directory(output_dir: str, addiotinal_dirs: list[str] = []):
+def _create_directory(output_dir: str, additional_dirs: list[str] = []):
     directories = ["inp", "out", "rtf", "prm", "str", "pdb", "psf", "rst"]
-    directories.extend(addiotinal_dirs)
+    directories.extend(additional_dirs)
 
     for directory in directories:
         os.makedirs(os.path.join(output_dir, directory), exist_ok=True)
