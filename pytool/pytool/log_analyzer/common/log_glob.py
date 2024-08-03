@@ -4,6 +4,12 @@ import natsort
 
 
 def glob_log_files(log_path: str):
+    """ログファイルのパスを全て取得する
+    取得したログファイルはnatsortでソートされる
+
+    Args:
+        log_path (str): *.log*ファイルが存在するディレクトリのパスもしくはログファイルそのもの
+    """
     if os.path.isfile(log_path):
         return [log_path]
     if os.path.isdir(log_path):
