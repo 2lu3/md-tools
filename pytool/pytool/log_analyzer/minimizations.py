@@ -1,4 +1,4 @@
-import click
+from argparse import ArgumentParser
 from loguru import logger
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -43,9 +43,13 @@ def analyze_minimizations(project_dirs: list[str], window_size: int = 10) -> Fig
     for name, step, potential_energy in zip(names, steps, potential_energies):
         ax_all.plot(step, potential_energy, label=name)
 
-        moving_average_y = np.convolve(potential_energy, np.ones(window_size) / window_size, mode="valid")
+        moving_average_y = np.convolve(
+            potential_energy, np.ones(window_size) / window_size, mode="valid"
+        )
         moving_average_x = np.arange(window_size // 2, len(step) - window_size // 2)
-        ax_all.plot(moving_average_x, moving_average_y, label=f"{name} (Moving average)")
+        ax_all.plot(
+            moving_average_x, moving_average_y, label=f"{name} (Moving average)"
+        )
 
     ax_all.set_title("Full period")
     ax_all.set_xlabel("STEP")
@@ -61,9 +65,12 @@ def analyze_minimizations(project_dirs: list[str], window_size: int = 10) -> Fig
         ax_half.plot(step, potential_energy, label=name)
 
         moving_average_x = np.arange(window_size // 2, len(step) - window_size // 2)
-        moving_average_y = np.convolve(potential_energy, np.ones(window_size) / window_size, mode="valid")
-        ax_half.plot(moving_average_x, moving_average_y, label=f"{name} (Moving average)")
-
+        moving_average_y = np.convolve(
+            potential_energy, np.ones(window_size) / window_size, mode="valid"
+        )
+        ax_half.plot(
+            moving_average_x, moving_average_y, label=f"{name} (Moving average)"
+        )
 
     ax_half.set_title("Second half")
     ax_half.set_xlabel("STEP")
@@ -75,14 +82,16 @@ def analyze_minimizations(project_dirs: list[str], window_size: int = 10) -> Fig
 
     return fig
 
-@click.command()
-@click.argument("project_dirs", type=list, multiple=True)
-@click.option("--out", type=str, default="minimization.png")
-@click.option("--window_size", type=int, default=10)
-@click.option("--popup", is_flag=True)
-def command(project_dirs: list[str], out: str, window_size: int, popup: bool):
-    fig = analyze_minimizations(project_dirs, window_size)
-    fig.savefig(out)
 
-    if popup:
+def command():
+    parser = ArgumentParser()
+    parser.add_argument("project_dirs", nargs="+", type=str)
+    parser.add_argument("--out", type=str, default="minimizations.png")
+    parser.add_argument("--window_size", type=int, default=10)
+    parser.add_argument("--popup", action="store_true")
+    args = parser.parse_args()
+    fig = analyze_minimizations(args.project_dirs, args.window_size)
+    fig.savefig(args.out)
+
+    if args.popup:
         plt.show()
