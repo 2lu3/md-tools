@@ -9,7 +9,9 @@ from .common.log_glob import glob_log_files
 from .common.reader import read_column_by_name
 
 
-def analyze_minimizations(project_dirs: list[str], window_size: int = 10) -> Figure:
+def analyze_minimizations(
+    project_dirs: list[str], window_size: int = 10, figsize: tuple[int, int] = (12, 6)
+) -> Figure:
     """各種グラフを複数のプロジェクトを統合して描画する
 
     Args:
@@ -37,7 +39,7 @@ def analyze_minimizations(project_dirs: list[str], window_size: int = 10) -> Fig
         steps.append(step)
         potential_energies.append(potential_energy)
 
-    fig: Figure = plt.figure()
+    fig: Figure = plt.figure(figsize=figsize)
     ax_all = fig.add_subplot(121)
 
     for name, step, potential_energy in zip(names, steps, potential_energies):
@@ -81,7 +83,6 @@ def analyze_minimizations(project_dirs: list[str], window_size: int = 10) -> Fig
     ax_half.set_ylabel("Potential Energy (KJ/mol))")
     ax_half.legend()
 
-    fig.tight_layout()
     fig.suptitle("Potential Energies")
 
     return fig
@@ -90,11 +91,14 @@ def analyze_minimizations(project_dirs: list[str], window_size: int = 10) -> Fig
 def command():
     parser = ArgumentParser()
     parser.add_argument("project_dirs", nargs="+", type=str)
+    parser.add_argument("--figsize", type=int, nargs=2, default=[12, 6])
     parser.add_argument("--out", type=str, default="minimizations.png")
     parser.add_argument("--window_size", type=int, default=10)
     parser.add_argument("--popup", action="store_true")
     args = parser.parse_args()
-    fig = analyze_minimizations(args.project_dirs, args.window_size)
+    fig = analyze_minimizations(
+        args.project_dirs, args.window_size, tuple([args.figsize[0], args.figsize[1]])
+    )
     fig.savefig(args.out)
 
     if args.popup:
