@@ -10,7 +10,10 @@ from .common.reader import read_column_by_name
 
 
 def analyze_minimizations(
-    project_dirs: list[str], window_size: int = 10, figsize: tuple[int, int] = (12, 6)
+    project_dirs: list[str],
+    use_moving_average: bool = False,
+    window_size: int = 10,
+    figsize: tuple[int, int] = (12, 6),
 ) -> Figure:
     """各種グラフを複数のプロジェクトを統合して描画する
 
@@ -45,15 +48,16 @@ def analyze_minimizations(
     for name, step, potential_energy in zip(names, steps, potential_energies):
         ax_all.plot(step, potential_energy, label=name)
 
-        moving_average_x = np.convolve(
-            step, np.ones(window_size) / window_size, mode="valid"
-        )
-        moving_average_y = np.convolve(
-            potential_energy, np.ones(window_size) / window_size, mode="valid"
-        )
-        ax_all.plot(
-            moving_average_x, moving_average_y, label=f"{name} (Moving average)"
-        )
+        if use_moving_average:
+            moving_average_x = np.convolve(
+                step, np.ones(window_size) / window_size, mode="valid"
+            )
+            moving_average_y = np.convolve(
+                potential_energy, np.ones(window_size) / window_size, mode="valid"
+            )
+            ax_all.plot(
+                moving_average_x, moving_average_y, label=f"{name} (Moving average)"
+            )
 
     ax_all.set_title("Full period")
     ax_all.set_xlabel("STEP")
@@ -68,15 +72,16 @@ def analyze_minimizations(
 
         ax_half.plot(step, potential_energy, label=name)
 
-        moving_average_x = np.convolve(
-            step, np.ones(window_size) / window_size, mode="valid"
-        )
-        moving_average_y = np.convolve(
-            potential_energy, np.ones(window_size) / window_size, mode="valid"
-        )
-        ax_half.plot(
-            moving_average_x, moving_average_y, label=f"{name} (Moving average)"
-        )
+        if use_moving_average:
+            moving_average_x = np.convolve(
+                step, np.ones(window_size) / window_size, mode="valid"
+            )
+            moving_average_y = np.convolve(
+                potential_energy, np.ones(window_size) / window_size, mode="valid"
+            )
+            ax_half.plot(
+                moving_average_x, moving_average_y, label=f"{name} (Moving average)"
+            )
 
     ax_half.set_title("Second half")
     ax_half.set_xlabel("STEP")
@@ -94,10 +99,14 @@ def command():
     parser.add_argument("--figsize", type=int, nargs=2, default=[12, 6])
     parser.add_argument("--out", type=str, default="minimizations.png")
     parser.add_argument("--window_size", type=int, default=10)
+    parser.add_argument("--use-moving_average", action="store_true")
     parser.add_argument("--popup", action="store_true")
     args = parser.parse_args()
     fig = analyze_minimizations(
-        args.project_dirs, args.window_size, tuple([args.figsize[0], args.figsize[1]])
+        args.project_dirs,
+        args.use_moving_average,
+        args.window_size,
+        tuple([args.figsize[0], args.figsize[1]]),
     )
     fig.savefig(args.out)
 
