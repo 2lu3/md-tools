@@ -76,7 +76,7 @@ def analyze_minimizations(project_dirs: list[str], window_size: int = 10) -> Fig
     return fig
 
 @click.command()
-@click.argument("project_dirs", type=list)
+@click.argument("project_dirs", type=list, multiple=True)
 @click.option("--out", type=str, default="minimization.png")
 @click.option("--window_size", type=int, default=10)
 @click.option("--popup", is_flag=True)
