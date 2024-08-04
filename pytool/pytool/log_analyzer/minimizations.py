@@ -43,10 +43,12 @@ def analyze_minimizations(project_dirs: list[str], window_size: int = 10) -> Fig
     for name, step, potential_energy in zip(names, steps, potential_energies):
         ax_all.plot(step, potential_energy, label=name)
 
+        moving_average_x = np.convolve(
+            step, np.ones(window_size) / window_size, mode="valid"
+        )
         moving_average_y = np.convolve(
             potential_energy, np.ones(window_size) / window_size, mode="valid"
         )
-        moving_average_x = np.arange(window_size // 2, len(step) - window_size // 2)
         ax_all.plot(
             moving_average_x, moving_average_y, label=f"{name} (Moving average)"
         )
@@ -64,7 +66,9 @@ def analyze_minimizations(project_dirs: list[str], window_size: int = 10) -> Fig
 
         ax_half.plot(step, potential_energy, label=name)
 
-        moving_average_x = np.arange(window_size // 2, len(step) - window_size // 2)
+        moving_average_x = np.convolve(
+            step, np.ones(window_size) / window_size, mode="valid"
+        )
         moving_average_y = np.convolve(
             potential_energy, np.ones(window_size) / window_size, mode="valid"
         )
