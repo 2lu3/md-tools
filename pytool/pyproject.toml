@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytool"
-version = "0.1.143"
+version = "0.1.144"
 description = "A tool for MD simulation"
 authors = ["2lu3 <hi2lu3@gmail.com>"]
 readme = "README.md"
