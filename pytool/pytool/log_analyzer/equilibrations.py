@@ -274,7 +274,7 @@ def command():
     parser.add_argument("--root-dir", type=str, default=None)
     parser.add_argument("--figsize", type=int, nargs=2, default=[12, 6])
     parser.add_argument("--out-name", type=str, default="equilibrations")
-    parser.add_argument("--window_size", type=int, default=10)
+    parser.add_argument("--window-size", type=int, default=10)
     parser.add_argument("--use-moving-average", action="store_true")
     args = parser.parse_args()
 
