@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from glob import glob
 import os
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -51,9 +52,6 @@ def analyze_single_column(
         ax = fig.add_subplot(1, len(file_names), i + 1)
         for data in data_list:
             if file_name in data.time.keys():
-                ax.plot(
-                    data.time[file_name], data.value[file_name], label=data.project_name
-                )
                 if use_moving_average:
                     moving_average_x = np.convolve(
                         data.time[file_name],
@@ -68,7 +66,13 @@ def analyze_single_column(
                     ax.plot(
                         moving_average_x,
                         moving_average_y,
-                        label=f"{data.project_name} (Moving average)",
+                        label=f"{data.project_name}",
+                    )
+                else:
+                    ax.plot(
+                        data.time[file_name],
+                        data.value[file_name],
+                        label=data.project_name,
                     )
         ax.legend()
         ax.set_title(file_name)
@@ -106,7 +110,7 @@ def analyze_box_sizes(
         for log_file in glob_log_files(project_dir):
             if "BOXX" not in read_column_names([log_file]):
                 continue
-            
+
             log_name = os.path.basename(os.path.normpath(log_file))
             time = list(map(int, read_column_by_name([log_file], "TIME")))
             x = list(map(float, read_column_by_name([log_file], "BOXX")))
@@ -147,10 +151,6 @@ def analyze_box_sizes(
                     else:
                         raise ValueError(f"Invalid dimension {dim}")
 
-                    ax.plot(
-                        data.time[file_name], y[file_name], label=f"{data.project_name}"
-                    )
-
                     if use_moving_average:
                         moving_average_x = np.convolve(
                             data.time[file_name],
@@ -166,6 +166,12 @@ def analyze_box_sizes(
                             moving_average_x,
                             moving_average_y,
                             label=f"{data.project_name} (Moving average)",
+                        )
+                    else:
+                        ax.plot(
+                            data.time[file_name],
+                            y[file_name],
+                            label=data.project_name,
                         )
 
             ax.legend()
@@ -261,15 +267,23 @@ def analyze_equilibrations(
 
 def command():
     parser = ArgumentParser()
-    parser.add_argument("project_dirs", nargs="+", type=str)
+    parser.add_argument("--project_dirs", nargs="+", type=str, default=None)
+    parser.add_argument("--root-dir", type=str, default=None)
     parser.add_argument("--figsize", type=int, nargs=2, default=[12, 6])
     parser.add_argument("--out-name", type=str, default="equilibrations")
     parser.add_argument("--window_size", type=int, default=10)
-    parser.add_argument("--use_moving_average", action="store_true")
+    parser.add_argument("--use-moving-average", action="store_true")
     args = parser.parse_args()
 
+    assert args.project_dirs is not None or args.root_dir is not None
+
+    if args.project_dirs is None:
+        dirs = glob(os.path.join(args.root_dir, "*/"))
+    else:
+        dirs = args.project_dirs
+
     figs = analyze_equilibrations(
-        args.project_dirs,
+        dirs,
         args.use_moving_average,
         args.window_size,
         args.figsize,
