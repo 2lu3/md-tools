@@ -6,7 +6,7 @@ import numpy as np
 from dataclasses import dataclass
 
 from .common.log_glob import glob_log_files
-from .common.reader import read_column_by_name
+from .common.reader import read_column_by_name, read_column_names
 
 
 def analyze_single_column(
@@ -31,6 +31,8 @@ def analyze_single_column(
             value={},
         )
         for log_file in glob_log_files(project_dir):
+            if column_name not in read_column_names([log_file]):
+                continue
             log_name = os.path.basename(os.path.normpath(log_file))
             time = list(map(int, read_column_by_name([log_file], "TIME")))
             value = list(map(float, read_column_by_name([log_file], column_name)))
@@ -102,6 +104,9 @@ def analyze_box_sizes(
         )
 
         for log_file in glob_log_files(project_dir):
+            if "BOXX" not in read_column_names([log_file]):
+                continue
+            
             log_name = os.path.basename(os.path.normpath(log_file))
             time = list(map(int, read_column_by_name([log_file], "TIME")))
             x = list(map(float, read_column_by_name([log_file], "BOXX")))
