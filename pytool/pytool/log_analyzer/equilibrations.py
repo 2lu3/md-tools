@@ -176,13 +176,13 @@ def analyze_box_sizes(
     return fig
 
 
-def analyze_equlibrations(
+def analyze_equilibrations(
     project_dirs: list[str],
     use_moving_average: bool = False,
     window_size: int = 10,
     figsize: tuple[int, int] = (12, 6),
 ) -> list[tuple[str, Figure]]:
-    """analyze_equlibrations.
+    """analyze_equilibrations.
 
     以下のグラフを作成する
     * 全エネルギー
@@ -268,7 +268,7 @@ def command():
     parser.add_argument("--use_moving_average", action="store_true")
     args = parser.parse_args()
 
-    figs = analyze_equlibrations(
+    figs = analyze_equilibrations(
         args.project_dirs,
         args.use_moving_average,
         args.window_size,
