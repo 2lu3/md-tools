@@ -16,6 +16,7 @@ copy-template='pytool.directory.copy_template:copy_template_to_command'
 # log_analyzer
 analyze-production = 'pytool.log_analyzer.production:command'
 analyze-equilibration = 'pytool.log_analyzer.equilibration:command'
+analyze-equilibrations = 'pytool.log_analyzer.equilibrations:command'
 analyze-minimization= 'pytool.log_analyzer.minimization:command'
 analyze-minimizations = 'pytool.log_analyzer.minimizations:command'
 
