@@ -3,6 +3,7 @@ from glob import glob
 import os
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
+from natsort import natsorted
 import numpy as np
 from dataclasses import dataclass
 
@@ -45,6 +46,7 @@ def analyze_single_column(
     file_names = set(
         [file_name for data in data_list for file_name in data.time.keys()]
     )
+    file_names = natsorted(file_names)
 
     fig = plt.figure(figsize=figsize)
 
@@ -127,6 +129,7 @@ def analyze_box_sizes(
     file_names = set(
         [file_name for data in data_list for file_name in data.time.keys()]
     )
+    file_names = natsorted(file_names)
 
     fig = plt.figure(figsize=figsize, constrained_layout=True)
 
