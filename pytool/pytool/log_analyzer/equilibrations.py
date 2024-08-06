@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from glob import glob
 import os
-from matplotlib import cm
+from matplotlib.pyplot import cm
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from natsort import natsorted
@@ -10,14 +10,6 @@ from dataclasses import dataclass
 
 from .common.log_glob import glob_log_files
 from .common.reader import read_column_by_name, read_column_names
-
-linestyles = [
-    "-",
-    "--",
-    "-.",
-    ":",
-]
-colors = cm.get_cmap("tab10")
 
 
 def analyze_single_column(
@@ -61,7 +53,8 @@ def analyze_single_column(
 
     for i, file_name in enumerate(file_names):
         ax = fig.add_subplot(1, len(file_names), i + 1)
-        index = 0
+        colors = iter(cm.get_cmap("rainbow")(np.linspace(0, 1, len(data_list))))
+
         for data in data_list:
             if file_name in data.time.keys():
                 if use_moving_average:
@@ -79,18 +72,15 @@ def analyze_single_column(
                         moving_average_x,
                         moving_average_y,
                         label=f"{data.project_name}",
-                        color=colors(index % 10),
-                        linestyle=linestyles[index // len(linestyles)],
+                        color=next(colors),
                     )
                 else:
                     ax.plot(
                         data.time[file_name],
                         data.value[file_name],
                         label=data.project_name,
-                        color=colors(index % 10),
-                        linestyle=linestyles[index // len(linestyles)],
+                        color=next(colors),
                     )
-                index += 1
         ax.legend()
         ax.set_title(file_name)
         ax.set_xlabel("Time (ps)")
@@ -148,12 +138,12 @@ def analyze_box_sizes(
 
     fig = plt.figure(figsize=figsize, constrained_layout=True)
 
-    subplot_index = 1
+    index = 1
     for dim in "XYZ":
         for file_name in file_names:
-            ax = fig.add_subplot(3, len(file_names), subplot_index)
-            subplot_index += 1
-            index = 1
+            ax = fig.add_subplot(3, len(file_names), index)
+            index += 1
+            colors = iter(cm.get_cmap("rainbow")(np.linspace(0, 1, len(data_list))))
 
             ax.set_title(f"{file_name} {dim}")
             ax.set_xlabel("Time (ps)")
@@ -185,16 +175,14 @@ def analyze_box_sizes(
                             moving_average_x,
                             moving_average_y,
                             label=f"{data.project_name} (Moving average)",
-                            color=colors(index % 10),
-                            linestyle=linestyles[index // len(linestyles)],
+                            color=next(colors)
                         )
                     else:
                         ax.plot(
                             data.time[file_name],
                             y[file_name],
                             label=data.project_name,
-                            color=colors(index % 10),
-                            linestyle=linestyles[index // len(linestyles)],
+                            color=next(colors),
                         )
                     index += 1
 
