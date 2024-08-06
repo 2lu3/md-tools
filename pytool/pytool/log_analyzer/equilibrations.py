@@ -77,14 +77,14 @@ def analyze_single_column(
                         moving_average_x,
                         moving_average_y,
                         label=f"{data.project_name}",
-                        style=next(linestyle_cycler),
+                        linestyle=next(linestyle_cycler),
                     )
                 else:
                     ax.plot(
                         data.time[file_name],
                         data.value[file_name],
                         label=data.project_name,
-                        style=next(linestyle_cycler),
+                        linestyle=next(linestyle_cycler),
                     )
         ax.legend()
         ax.set_title(file_name)
@@ -182,14 +182,14 @@ def analyze_box_sizes(
                             moving_average_x,
                             moving_average_y,
                             label=data.project_name,
-                            style=next(linestyle_cycler),
+                            linestyle=next(linestyle_cycler),
                         )
                     else:
                         ax.plot(
                             data.time[file_name],
                             y[file_name],
                             label=data.project_name,
-                            style=next(linestyle_cycler),
+                            linestyle=next(linestyle_cycler),
                         )
 
             ax.legend()
