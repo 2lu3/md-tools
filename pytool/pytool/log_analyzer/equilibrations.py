@@ -150,7 +150,6 @@ def analyze_box_sizes(
             index += 1
             cmap = cm.get_cmap("tab20c")
             ax.set_prop_cycle(color=[cmap(i) for i in np.linspace(0, 1, len(data_list) // len(linestyles) + 1)] * len(linestyles))
-            ax.set_prop_cycle(line=linestyles)
 
             ax.set_title(f"{file_name} {dim}")
             ax.set_xlabel("Time (ps)")
