@@ -184,7 +184,6 @@ def analyze_box_sizes(
                             label=data.project_name,
                             color=next(colors),
                         )
-                    index += 1
 
             ax.legend()
 
