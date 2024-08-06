@@ -48,7 +48,7 @@ def analyze_single_column(
     )
     file_names = natsorted(file_names)
 
-    fig = plt.figure(figsize=figsize)
+    fig = plt.figure(figsize=figsize, constrained_layout=True)
 
     for i, file_name in enumerate(file_names):
         ax = fig.add_subplot(1, len(file_names), i + 1)
