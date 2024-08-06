@@ -148,11 +148,12 @@ def analyze_box_sizes(
 
     fig = plt.figure(figsize=figsize, constrained_layout=True)
 
-    index = 1
+    subplot_index = 1
     for dim in "XYZ":
         for file_name in file_names:
-            ax = fig.add_subplot(3, len(file_names), index)
-            index += 1
+            ax = fig.add_subplot(3, len(file_names), subplot_index)
+            subplot_index += 1
+            index = 1
 
             ax.set_title(f"{file_name} {dim}")
             ax.set_xlabel("Time (ps)")
@@ -195,6 +196,7 @@ def analyze_box_sizes(
                             color=colors(index % 10),
                             linestyle=linestyles[index // len(linestyles)],
                         )
+                    index += 1
 
             ax.legend()
 
