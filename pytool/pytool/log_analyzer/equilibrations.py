@@ -53,7 +53,8 @@ def analyze_single_column(
 
     for i, file_name in enumerate(file_names):
         ax = fig.add_subplot(1, len(file_names), i + 1)
-        colors = iter(cm.get_cmap("rainbow")(np.linspace(0, 1, len(data_list))))
+        cmap = cm.get_cmap("tab20c")
+        ax.set_prop_cycle(color=[cmap(i) for i in np.linspace(0, 1, len(data_list))])
 
         for data in data_list:
             if file_name in data.time.keys():
@@ -72,14 +73,12 @@ def analyze_single_column(
                         moving_average_x,
                         moving_average_y,
                         label=f"{data.project_name}",
-                        color=next(colors),
                     )
                 else:
                     ax.plot(
                         data.time[file_name],
                         data.value[file_name],
                         label=data.project_name,
-                        color=next(colors),
                     )
         ax.legend()
         ax.set_title(file_name)
@@ -143,7 +142,8 @@ def analyze_box_sizes(
         for file_name in file_names:
             ax = fig.add_subplot(3, len(file_names), index)
             index += 1
-            colors = iter(cm.get_cmap("rainbow")(np.linspace(0, 1, len(data_list))))
+            cmap = cm.get_cmap("tab20c")
+            ax.set_prop_cycle(color=[cmap(i) for i in np.linspace(0, 1, len(data_list))])
 
             ax.set_title(f"{file_name} {dim}")
             ax.set_xlabel("Time (ps)")
@@ -174,15 +174,13 @@ def analyze_box_sizes(
                         ax.plot(
                             moving_average_x,
                             moving_average_y,
-                            label=f"{data.project_name} (Moving average)",
-                            color=next(colors)
+                            label=data.project_name,
                         )
                     else:
                         ax.plot(
                             data.time[file_name],
                             y[file_name],
                             label=data.project_name,
-                            color=next(colors),
                         )
 
             ax.legend()
