@@ -58,7 +58,7 @@ def analyze_single_column(
     for i, file_name in enumerate(file_names):
         ax = fig.add_subplot(1, len(file_names), i + 1)
         cmap = cm.get_cmap("tab20c")
-        ax.set_prop_cycle(color=[cmap(i) for i in np.linspace(0, 1, len(data_list) // len(linestyles) + 1)] * len(linestyles))
+        ax.set_prop_cycle(color=[cmap(i) for _ in range(len(linestyles)) for i in np.linspace(0, 1, len(data_list) // len(linestyles) + 1)])
 
         for data in data_list:
             if file_name in data.time.keys():
@@ -149,7 +149,7 @@ def analyze_box_sizes(
             ax = fig.add_subplot(3, len(file_names), index)
             index += 1
             cmap = cm.get_cmap("tab20c")
-            ax.set_prop_cycle(color=[cmap(i) for i in np.linspace(0, 1, len(data_list) // len(linestyles) + 1)] * len(linestyles))
+            ax.set_prop_cycle(color=[cmap(i) for _ in range(len(linestyles)) for i in np.linspace(0, 1, len(data_list) // len(linestyles) + 1)])
 
             ax.set_title(f"{file_name} {dim}")
             ax.set_xlabel("Time (ps)")
