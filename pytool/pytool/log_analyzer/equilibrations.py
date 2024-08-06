@@ -13,7 +13,6 @@ from .common.log_glob import glob_log_files
 from .common.reader import read_column_by_name, read_column_names
 
 linestyles = ["-", "--", "-.", ":"]
-linestyle_cycler = cycle(linestyles)
 
 
 def analyze_single_column(
@@ -48,6 +47,8 @@ def analyze_single_column(
             data.value[log_name] = value
         data_list.append(data)
 
+    data_list = sorted(data_list, key=lambda x: x.project_name)
+
     file_names = set(
         [file_name for data in data_list for file_name in data.time.keys()]
     )
@@ -59,6 +60,7 @@ def analyze_single_column(
         ax = fig.add_subplot(1, len(file_names), i + 1)
         cmap = cm.get_cmap("tab20c")
         ax.set_prop_cycle(color=[cmap(i) for _ in range(len(linestyles)) for i in np.linspace(0, 1, len(data_list) // len(linestyles) + 1)])
+        linestyle_cycler = cycle(linestyles)
 
         for data in data_list:
             if file_name in data.time.keys():
@@ -136,6 +138,8 @@ def analyze_box_sizes(
 
         data_list.append(data)
 
+    data_list = sorted(data_list, key=lambda x: x.project_name)
+
     file_names = set(
         [file_name for data in data_list for file_name in data.time.keys()]
     )
@@ -150,6 +154,7 @@ def analyze_box_sizes(
             index += 1
             cmap = cm.get_cmap("tab20c")
             ax.set_prop_cycle(color=[cmap(i) for _ in range(len(linestyles)) for i in np.linspace(0, 1, len(data_list) // len(linestyles) + 1)])
+            linestyle_cycler = cycle(linestyles)
 
             ax.set_title(f"{file_name} {dim}")
             ax.set_xlabel("Time (ps)")
