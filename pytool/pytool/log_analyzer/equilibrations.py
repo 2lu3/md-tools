@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from glob import glob
+from itertools import cycle
 import os
 from matplotlib.pyplot import cm
 import matplotlib.pyplot as plt
@@ -12,6 +13,7 @@ from .common.log_glob import glob_log_files
 from .common.reader import read_column_by_name, read_column_names
 
 linestyles = ["-", "--", "-.", ":"]
+linestyle_cycler = cycle(linestyles)
 
 
 def analyze_single_column(
@@ -57,7 +59,6 @@ def analyze_single_column(
         ax = fig.add_subplot(1, len(file_names), i + 1)
         cmap = cm.get_cmap("tab20c")
         ax.set_prop_cycle(color=[cmap(i) for i in np.linspace(0, 1, len(data_list) // len(linestyles) + 1)] * len(linestyles))
-        ax.set_prop_cycle(line=linestyles)
 
         for data in data_list:
             if file_name in data.time.keys():
@@ -76,12 +77,14 @@ def analyze_single_column(
                         moving_average_x,
                         moving_average_y,
                         label=f"{data.project_name}",
+                        style=next(linestyle_cycler),
                     )
                 else:
                     ax.plot(
                         data.time[file_name],
                         data.value[file_name],
                         label=data.project_name,
+                        style=next(linestyle_cycler),
                     )
         ax.legend()
         ax.set_title(file_name)
@@ -179,12 +182,14 @@ def analyze_box_sizes(
                             moving_average_x,
                             moving_average_y,
                             label=data.project_name,
+                            style=next(linestyle_cycler),
                         )
                     else:
                         ax.plot(
                             data.time[file_name],
                             y[file_name],
                             label=data.project_name,
+                            style=next(linestyle_cycler),
                         )
 
             ax.legend()
