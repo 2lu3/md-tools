@@ -16,9 +16,9 @@ def create_project(project_dir: str, is_clean: bool, extra_keywords: dict = {}):
     copy_toppar_files("../01_data/c36", project_dir)
     copy_structure_files(
         output_dir=project_dir,
-        pdb_file=f"../03_minimization/{project_name}/pdb/input.pdb",
-        psf_file=f"../03_minimization/{project_name}/psf/input.psf",
-        rst_file=f"../03_minimization/{project_name}/out/min0.rst",
+        pdb_file=f"../03_minimization/projects/{project_name}/pdb/input.pdb",
+        psf_file=f"../03_minimization/projects/{project_name}/psf/input.psf",
+        rst_file=f"../03_minimization/projects/{project_name}/out/min0.rst",
     )
 
     keywords: dict = {
