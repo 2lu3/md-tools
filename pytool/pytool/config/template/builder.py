@@ -24,16 +24,17 @@ def create_project(project_dir: str, is_clean: bool, extra_keywords: dict = {}):
     keywords: dict = {
         "nsteps": 100000,
         "mode": "eq",
+        "index_num": 3,
+        "node": 1,
         "proc": 8,
         "thread": 3,
         "proc_per_node": 8,
-        "node": 1,
         "elapse": "01:00:00",
         "user_id": os.environ["FUGAKU_USER_ID"],
     }
     keywords.update(extra_keywords)
 
-    for i in range(3):
+    for i in range(keywords["index_num"]):
         keywords["index"] = i
         render2file(f"{project_dir}/inp/{keywords['mode']}{i}.inp", f"{keywords['mode']}0.inp", keywords)
         render2file(f"{project_dir}/job{i}.sh", f"job.sh", keywords)
