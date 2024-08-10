@@ -11,13 +11,14 @@ import argparse
 import os
 
 def create_project(project_dir: str, is_clean: bool, extra_keywords: dict = {}):
+    project_name = os.path.basename(os.path.normpath(project_dir))
     clean_directory(project_dir, is_clean)
     copy_toppar_files("../01_data/c36", project_dir)
     copy_structure_files(
         output_dir=project_dir,
-        pdb_file="../03_minimization/project/pdb/input.pdb",
-        psf_file="../03_minimization/project/psf/input.psf",
-        rst_file="../03_minimization/project/out/min0.rst",
+        pdb_file=f"../03_minimization/{project_name}/pdb/input.pdb",
+        psf_file=f"../03_minimization/{project_name}/psf/input.psf",
+        rst_file=f"../03_minimization/{project_name}/out/min0.rst",
     )
 
     keywords: dict = {
