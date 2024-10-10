@@ -59,8 +59,13 @@ def create_benchmark():
 
 
 def main(is_clean: bool):
-    create_project("project", is_clean)
+    projects = []
+    for project in projects:
+        create_project(f"projects/{project}", is_clean)
     create_benchmark()
+
+    render2file("submit_all.sh", "submit_all.sh", {})
+    os.chmod("submit_all.sh", 0o755)
 
 
 if __name__ == "__main__":
