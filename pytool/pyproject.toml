@@ -40,6 +40,11 @@ align-trajectory='pytool.structure.align:align_trajectory_to_command'
 concat-dcd = "pytool.trajectory.__init__:concat_dcd"
 sample-trajectory='pytool.trajectory.sample_trajectory:command'
 
+# useful commands
+dvc-add = "pytool.useful_commands.dvc:dvc_add_to_command"
+install-genesis = "pytool.useful_commands.genesis:install_genesis_to_command"
+install_genesis_requirements = "pytool.useful_commands.genesis:install_genesis_requirements_to_command"
+
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
