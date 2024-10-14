@@ -47,7 +47,7 @@ install_genesis_requirements = "pytool.useful_commands.genesis:install_genesis_r
 
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.13"
+python = ">=3.9"
 mdanalysis = "^2.6.0"
 click = "^8.1.7"
 natsort = "^8.4.0"
