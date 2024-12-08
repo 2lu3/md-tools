@@ -2,7 +2,7 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import os
 import numpy as np
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from itertools import cycle
 from matplotlib import cm
 from natsort import natsorted
@@ -14,8 +14,8 @@ linestyles = ["-", "--", "-.", ":"]
 @dataclass
 class Data:
    project_name: str
-   time: dict[str, list[int]] = {}
-   value: dict[str, list[float]] = {}
+   time: dict[str, list[int]] = field(default_factory=dict)
+   value: dict[str, list[float]] = field(default_factory=dict)
 
 
 def read_column(project_dir: str, column_name: str) -> Data:
