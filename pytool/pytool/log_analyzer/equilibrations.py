@@ -11,91 +11,9 @@ from dataclasses import dataclass
 
 from .common.log_glob import glob_log_files
 from .common.reader import read_column_by_name, read_column_names
+from .common.fig_by_column import fig_by_column
 
 linestyles = ["-", "--", "-.", ":"]
-
-
-def analyze_single_column(
-    project_dirs: list[str],
-    column_name: str,
-    display_name: str,
-    use_moving_average: bool,
-    window_size: int,
-    figsize: tuple[int, int],
-) -> Figure:
-    @dataclass
-    class Data:
-        project_name: str
-        time: dict[str, list[int]]
-        value: dict[str, list[float]]
-
-    data_list: list[Data] = []
-    for project_dir in project_dirs:
-        data = Data(
-            project_name=os.path.basename(os.path.normpath(project_dir)),
-            time={},
-            value={},
-        )
-        for log_file in glob_log_files(project_dir):
-            if column_name not in read_column_names([log_file]):
-                continue
-            log_name = os.path.basename(os.path.normpath(log_file))
-            time = list(map(int, read_column_by_name([log_file], "TIME")))
-            value = list(map(float, read_column_by_name([log_file], column_name)))
-
-            data.time[log_name] = time
-            data.value[log_name] = value
-        data_list.append(data)
-
-    data_list = sorted(data_list, key=lambda x: x.project_name)
-
-    file_names = set(
-        [file_name for data in data_list for file_name in data.time.keys()]
-    )
-    file_names = natsorted(file_names)
-
-    fig = plt.figure(figsize=figsize, constrained_layout=True)
-
-    for i, file_name in enumerate(file_names):
-        ax = fig.add_subplot(1, len(file_names), i + 1)
-        cmap = cm.get_cmap("tab20c")
-        ax.set_prop_cycle(color=[cmap(i) for i in np.linspace(0, 1, len(data_list) // len(linestyles) + 1) for _ in range(len(linestyles)) ])
-        linestyle_cycler = cycle(linestyles)
-
-        for data in data_list:
-            if file_name in data.time.keys():
-                if use_moving_average:
-                    moving_average_x = np.convolve(
-                        data.time[file_name],
-                        np.ones(window_size) / window_size,
-                        mode="valid",
-                    )
-                    moving_average_y = np.convolve(
-                        data.value[file_name],
-                        np.ones(window_size) / window_size,
-                        mode="valid",
-                    )
-                    ax.plot(
-                        moving_average_x,
-                        moving_average_y,
-                        label=f"{data.project_name}",
-                        linestyle=next(linestyle_cycler),
-                    )
-                else:
-                    ax.plot(
-                        data.time[file_name],
-                        data.value[file_name],
-                        label=data.project_name,
-                        linestyle=next(linestyle_cycler),
-                    )
-        ax.legend()
-        ax.set_title(file_name)
-        ax.set_xlabel("Time (ps)")
-        ax.set_ylabel(column_name)
-
-    fig.suptitle(display_name)
-    return fig
-
 
 def analyze_box_sizes(
     project_dirs: list[str],
@@ -231,7 +149,7 @@ def analyze_equilibrations(
         Figure:
     """
 
-    fig_total_energy = analyze_single_column(
+    fig_total_energy = fig_by_column(
         project_dirs,
         "TOTAL_ENE",
         "Total Energy (KJ/mol)",
@@ -239,7 +157,7 @@ def analyze_equilibrations(
         window_size,
         figsize,
     )
-    fig_potential_energy = analyze_single_column(
+    fig_potential_energy = fig_by_column(
         project_dirs,
         "POTENTIAL_ENE",
         "Potential Energy (KJ/mol)",
@@ -247,7 +165,7 @@ def analyze_equilibrations(
         window_size,
         figsize,
     )
-    fig_kinetic_energy = analyze_single_column(
+    fig_kinetic_energy = fig_by_column(
         project_dirs,
         "KINETIC_ENE",
         "Kinetic Energy (KJ/mol)",
@@ -255,7 +173,7 @@ def analyze_equilibrations(
         window_size,
         figsize,
     )
-    fig_temperature = analyze_single_column(
+    fig_temperature = fig_by_column(
         project_dirs,
         "TEMPERATURE",
         "Temperature (K)",
@@ -268,7 +186,7 @@ def analyze_equilibrations(
         project_dirs, use_moving_average, window_size, figsize
     )
 
-    fig_pressure = analyze_single_column(
+    fig_pressure = fig_by_column(
         project_dirs,
         "PRESSURE",
         "Pressure (bar)",
