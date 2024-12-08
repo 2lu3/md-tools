@@ -8,9 +8,9 @@ from .common.fig_by_column import fig_by_column
 
 def analyze_productions(
     project_dirs: list[str],
-    use_moving_average: bool,
-    window_size: int,
-    figsize: tuple[int, int],
+    use_moving_average: bool = False,
+    window_size: int = 10,
+    figsize: tuple[int, int] = (12, 6),
     ) -> list[tuple[str, Figure]]:
 
     fig_total_energy = fig_by_column(
