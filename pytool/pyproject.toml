@@ -39,6 +39,7 @@ align-trajectory='pytool.structure.align:align_trajectory_to_command'
 # trajectory
 concat-dcd = "pytool.trajectory.__init__:concat_dcd"
 sample-trajectory='pytool.trajectory.sample_trajectory:command'
+reduce-dcd = "pytool.trajectory.reduce_dcd:reduce_dcd_to_command"
 
 # useful commands
 dvc-add = "pytool.useful_commands.dvc:dvc_add_to_command"

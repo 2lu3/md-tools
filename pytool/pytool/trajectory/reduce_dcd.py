@@ -24,7 +24,7 @@ def reduce_dcd(input_path: str, stride: int, out_path: str):
                     out.write(ts[0], ts[1])
 
 
-def main():
+def reduce_dcd_to_command():
     parser = argparse.ArgumentParser(
         description="Reduce the number of frames in a DCD file"
     )
