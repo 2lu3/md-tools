@@ -13,7 +13,7 @@ class Configuration:
 
     def _root_dir(self):
         userhome_dir = os.path.expanduser('~')
-        return os.path.join(userhome_dir, '.config', '.dit')
+        return os.path.join(userhome_dir, '.config', 'dit')
 
     def load_config(self):
         try:

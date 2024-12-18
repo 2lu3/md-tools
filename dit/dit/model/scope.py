@@ -4,12 +4,11 @@ from .config import Configuration
 from .git import Git
 
 
-
-class Directory:
+class Scope:
     """ditが管理するディレクトリを示す"""
 
     def __init__(self):
-        self.directories = self._load_config()
+        self.directories: list[str] = self._load_config()
 
     def find_patterns(self, patterns: list[str]):
         files = []
@@ -25,6 +24,7 @@ class Directory:
         self._save_config()
 
     def remove_directory(self, dir_path: str):
+        assert os.path.normpath(dir_path) in self.directories, f"{dir_path} is not in scope"
         self.directories.remove(os.path.normpath(dir_path))
         self._save_config()
 
@@ -32,7 +32,10 @@ class Directory:
         git = Git()
         config = Configuration(git.root_dir())
 
-        return config.load_config().get("directories", [])
+        directories: list[str] = config.load_config().get("directories", [])
+        assert type(directories) == list
+        return directories
+
 
     def _save_config(self):
         git = Git()

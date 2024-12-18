@@ -7,9 +7,11 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-
-
 loguru = "^0.7.3"
+black = "^24.10.0"
+natsort = "^8.4.0"
+pysimplegui = "^5.0.7"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
