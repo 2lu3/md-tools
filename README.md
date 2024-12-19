@@ -7,6 +7,7 @@ This repository contains some useful tools to performe molecular dynamics simula
 
 ```
 pip install git+https://github.com/2lu3/md-tools.git#subdirectory=pytool
+pip install git+https://github.com/2lu3/md-tools.git#subdirectory=dit
 ```
 
 ## DVC
