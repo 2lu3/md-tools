@@ -1,0 +1,46 @@
+name: Increment Version
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'dit/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'dit/**'
+  workflow_dispatch:
+
+jobs:
+  increment_version:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: install poetry
+      run: |
+        pip3 install -U poetry
+
+    - name: Increment version
+      run: |
+        cd dit
+        poetry version patch
+
+    - name: Commit and push
+      run: |
+        git remote set-url origin https://github-actions:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add -A
+        git commit -am "Increment version"
+        git push
+
+    - name: Notify discord
+      uses: sarisia/actions-status-discord@v1
+      if: always()
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
