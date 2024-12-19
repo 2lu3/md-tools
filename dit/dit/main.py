@@ -1,13 +1,15 @@
 import argparse
+from .command import add
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser("DitはGitとDVCを併用するためのツールです。")
+    subparser = parser.add_subparsers(dest="command", required=True)
 
-    parser.add_argument("add", type=str,nargs='?')
+    add.register_subparser(subparser)
 
     args = parser.parse_args()
-    print(args.add)
-    pass
+    if args.command == "add":
+        add.handle(args)
 
 
 if __name__ == "__main__":

@@ -38,3 +38,19 @@ def list_extension_to_command():
 
     for ext in extension.extensions:
         print(ext)
+
+def from_parser(parser: argparse.ArgumentParser):
+    subparser = parser.add_subparsers()
+
+    add_parser = subparser.add_parser("add", help="新たに拡張子を追加する")
+
+    remove_parser = subparser.add_parser("remove", help="拡張子を削除する")
+
+    list_parser = subparser.add_parser("list", help="登録されている拡張子を表示する")
+
+    parser.add_argument("command", type=str, nargs='?')
+
+    args = parser.parse_args()
+
+    if hasattr(args, "handler"):
+        args.handler(

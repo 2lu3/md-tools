@@ -17,6 +17,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-
 dit = 'dit.command:dit.main'
-dit-add = 'dit.command.add:to_command'

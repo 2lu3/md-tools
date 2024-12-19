@@ -42,13 +42,12 @@ def add(path_list: list[str], is_all: bool):
     print(dvc_result)
 
 
-def to_command():
-    parser = argparse.ArgumentParser()
-
+def register_subparser(subparser):
+    parser = subparser.add_parser("add", help="git add/dvc addを行う。")
     parser.add_argument("path", help="git add/dvc addする対象のディレクトリ/ファイルを選ぶ。それ以外は実行されない。Scopeには影響しない", type=str, nargs='*')
     parser.add_argument("-A", "--all", help="Scopeの中の全てのファイルに対してgit add/dvc addを行う。", action="store_true")
 
-    args = parser.parse_args()
 
+def handle(args: argparse.Namespace):
     add(args.path, args.all)
 
