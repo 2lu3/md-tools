@@ -48,9 +48,3 @@ def from_parser(parser: argparse.ArgumentParser):
 
     list_parser = subparser.add_parser("list", help="登録されている拡張子を表示する")
 
-    parser.add_argument("command", type=str, nargs='?')
-
-    args = parser.parse_args()
-
-    if hasattr(args, "handler"):
-        args.handler(
