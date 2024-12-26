@@ -23,7 +23,7 @@ def remove(args):
     scope.remove_directory(args.directory)
 
 def register_subparser(subparser):
-    parser = subparser.add_parser("scope", help="scopeを管理する")
+    parser = subparser.add_subparsers("scope", help="scope subcommands")
     add_parser = parser.add_parser("add", help="add directory to scope")
     add_parser.add_argument("directory", help="directory to add")
     add_parser.set_defaults(handler=add)
