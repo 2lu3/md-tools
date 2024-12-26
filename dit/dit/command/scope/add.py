@@ -2,10 +2,10 @@ import argparse
 from dit.model.scope import Scope
 import os
 
-def add_scope(directory: str):
+def add_scope(args):
     scope = Scope()
-    assert os.path.isdir(directory), f"{directory} is not a directory"
-    scope.add_directory(directory)
+    assert os.path.isdir(args.directory), f"{args.directory} is not a directory"
+    scope.add_directory(args.directory)
 
 def register_subparser(subparser):
     parser = subparser.add_parser("add", help="Scopeにディレクトリを追加する")
