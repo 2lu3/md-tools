@@ -13,7 +13,6 @@ def main():
     args = parser.parse_args()
     add.handle(args)
     clean.handle(args)
-    scope.handle(args)
 
 
 if __name__ == "__main__":
