@@ -11,6 +11,7 @@ def main():
     scope.register_subparser(subparser)
 
     args = parser.parse_args()
+    args.func(args)
     #add.handle(args)
     #clean.handle(args)
 
