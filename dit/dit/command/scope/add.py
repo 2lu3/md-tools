@@ -8,8 +8,10 @@ def add_scope(directory: str):
     scope.add_directory(directory)
 
 def register_subparser(subparser):
-    parser = subparser.add_parser("add-scope", help="Scopeにディレクトリを追加する")
+    parser = subparser.add_parser("add", help="Scopeにディレクトリを追加する")
     parser.add_argument("directory", type=str, help="新たに加える監視ディレクトリ")
 
 def handle(args: argparse.Namespace):
+    if args.command != "add":
+        return
     add_scope(args.directory)

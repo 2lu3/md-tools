@@ -18,4 +18,6 @@ def register_subparser(subparser):
     )
 
 def handle(args: argparse.Namespace):
+    if args.command != "list":
+        return
     list_scope()

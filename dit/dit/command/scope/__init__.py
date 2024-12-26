@@ -17,12 +17,14 @@ def register_subparser(subparser):
 
 
 def handle(args: argparse.Namespace):
-    if args.command == "add":
-        from .add import handle
-        handle(args)
-    elif args.command == "list":
-        from .list import handle
-        handle(args)
-    elif args.command == "remove":
-        from .remove import handle
-        handle(args)
+    if args.command != "scope":
+        return
+
+    from .add import handle as add_handle
+    from .list import handle as list_handle
+    from .remove import handle as remove_handle
+
+    add_handle(args)
+    list_handle(args)
+    remove_handle(args)
+

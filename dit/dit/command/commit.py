@@ -11,5 +11,7 @@ def register_subparser(subparser):
 
 
 def handle(args: Namespace):
+    if args.command != "commit":
+        return
     commit(args.message)
 

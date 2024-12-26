@@ -15,4 +15,6 @@ def register_subparser(subparser):
 
 
 def handle(args: argparse.Namespace):
+    if args.command != "remove":
+        return
     remove_scope(args.directory)
