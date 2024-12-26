@@ -2,6 +2,7 @@ import argparse
 from dit.model.scope import Scope
 from natsort import natsorted
 
+
 def list_scope():
     scope = Scope()
 
@@ -11,11 +12,10 @@ def list_scope():
         print(directory)
 
 
+def register_subparser(subparser):
+    parser = subparser.add_parser(
+        "list", help="Scopeに登録されているディレクトリを表示する"
+    )
 
-def to_command():
-    parser = argparse.ArgumentParser()
-
-    args = parser.parse_args()
-
+def handle(args: argparse.Namespace):
     list_scope()
-
