@@ -24,14 +24,17 @@ def remove(args):
 
 def register_subparser(subparser):
     parser = subparser.add_subparsers("scope", help="scope subcommands")
-    add_parser = parser.add_parser("add", help="add directory to scope")
+
+    subsubparser = parser.add_subparsers(dest="command", help="scope subcommands")
+
+    add_parser = subsubparser.add_parser("add", help="add directory to scope")
     add_parser.add_argument("directory", help="directory to add")
     add_parser.set_defaults(handler=add)
 
-    list_parser = parser.add_parser("list", help="list directories in scope")
+    list_parser = subsubparser.add_parser("list", help="list directories in scope")
     list_parser.set_defaults(handler=list)
 
-    remove_parser = parser.add_parser("remove", help="remove directory from scope")
+    remove_parser = subsubparser.add_parser("remove", help="remove directory from scope")
     remove_parser.add_argument("directory", help="directory to remove")
     remove_parser.set_defaults(handler=remove)
 
