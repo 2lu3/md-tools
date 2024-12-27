@@ -26,7 +26,7 @@ class Extension:
     def _load(self):
         git = Git()
         config = Configuration()
-        extensions: list[str] = config.load_config().get("extensions", [])
+        extensions: list[str] = config.load_config().get("extensions", set())
         assert type(extensions) == set
         return extensions
 

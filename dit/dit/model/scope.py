@@ -41,7 +41,7 @@ class Scope:
     def _load_config(self):
         config = Configuration()
 
-        directories: set[str] = config.load_config().get("directories", [])
+        directories: set[str] = config.load_config().get("directories", set())
         assert type(directories) == set
 
         Scope.directories = directories
