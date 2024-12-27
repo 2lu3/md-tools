@@ -18,7 +18,7 @@ class Scope:
         files = []
         for directory in Scope.directories:
             for pattern in file_patterns:
-                files.extend(glob(os.path.join(directory, f"**/{pattern}")))
+                files.extend(glob(os.path.join(directory, f"**/{pattern}"), recursive=True))
 
         files = set(files)
         logger.debug(f"patterns: {file_patterns}: {len(files)} files found")
