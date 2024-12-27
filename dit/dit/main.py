@@ -1,5 +1,5 @@
 import argparse
-from .command import add, clean, scope
+from .command import add, clean, scope, extension
 
 
 def main():
@@ -9,6 +9,7 @@ def main():
     #add.register_subparser(subparser)
     #clean.register_subparser(subparser)
     scope.register_subparser(subparser)
+    extension.register_subparser(subparser)
 
     args = parser.parse_args()
     args.func(args)
