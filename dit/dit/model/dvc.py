@@ -14,6 +14,8 @@ class DVC:
         files = []
         for directory in self.scope.directories:
             relpath = os.path.relpath(directory, start=os.getcwd())
+            print(os.path.join(relpath, "**", "*.dvc"))
+            print(glob.glob(os.path.join(relpath, "**", "*.dvc"), recursive=True))
             files.extend(
                 glob.glob(os.path.join(relpath, "**", "*.dvc"), recursive=True)
             )
