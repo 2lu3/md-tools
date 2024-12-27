@@ -4,10 +4,10 @@ from .git import Git
 class Extension:
     """dvcで管理されるべき拡張子を示す"""
     def __init__(self):
-       self.extensions: list[str] = self._load()
+       self.extensions: set[str] = self._load()
 
     def add(self, pattern: str):
-        self.extensions.append(pattern)
+        self.extensions.add(pattern)
         self._save()
 
     def remove(self, pattern: str):
@@ -27,7 +27,7 @@ class Extension:
         git = Git()
         config = Configuration()
         extensions: list[str] = config.load_config().get("extensions", [])
-        assert type(extensions) == list
+        assert type(extensions) == set
         return extensions
 
     def _save(self):

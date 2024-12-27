@@ -8,7 +8,7 @@ from loguru import logger
 class Scope:
     """ditが管理するディレクトリを示す"""
 
-    directories: list[str] = []
+    directories: set[str] = []
 
     def __init__(self):
         self.git = Git()
@@ -25,7 +25,7 @@ class Scope:
         return files
 
     def add(self, dir_path: str):
-        Scope.directories.append(self._norm_path(dir_path))
+        Scope.directories.add(self._norm_path(dir_path))
         self._save_config()
         logger.debug(f"added {dir_path} to scope")
 
@@ -41,8 +41,8 @@ class Scope:
     def _load_config(self):
         config = Configuration()
 
-        directories: list[str] = config.load_config().get("directories", [])
-        assert type(directories) == list
+        directories: set[str] = config.load_config().get("directories", [])
+        assert type(directories) == set
 
         Scope.directories = directories
         logger.debug(f"loaded {len(directories)} directories")
