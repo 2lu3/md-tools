@@ -16,7 +16,6 @@ def _git_pull(dry_run: bool):
 def _dvc_pull(dry_run: bool):
     files_to_pull = []
     scope = Scope()
-    print("helloo")
     scope.find_patterns(["*.dvc"])
 
     if dry_run:
