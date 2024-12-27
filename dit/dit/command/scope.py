@@ -1,4 +1,3 @@
-import argparse
 from dit.model.scope import Scope
 import os
 from natsort import natsorted
