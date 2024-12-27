@@ -36,7 +36,6 @@ def pull(dry_run: bool):
         print("Dry run")
         return
 
-    dvc_result = subprocess.run(["dvc", "pull"], capture_output=True, text=True)
-    print(dvc_result)
-    git_result = subprocess.run(["git", "pull"], capture_output=True, text=True)
-    print(git_result)
+    _dvc_pull(dry_run)
+    _git_pull(dry_run)
+
