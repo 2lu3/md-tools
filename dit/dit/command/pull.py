@@ -1,3 +1,4 @@
+from typing import IO
 import click
 import subprocess
 
@@ -9,8 +10,19 @@ def _git_pull(dry_run: bool):
         print("Dry run: git pull")
         return
 
-    result = subprocess.run(["git", "pull"], capture_output=True, text=True)
-    print(result)
+    proc = subprocess.Popen(
+        ["git", "pull"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    while True:
+        assert proc.stdout is not None
+        line = proc.stdout.readline()
+
+        if line:
+            print(line.decode("utf-8").strip())
+            continue
+
+        if proc.poll() is not None:
+            break
 
 
 def _dvc_pull(dry_run: bool):
@@ -25,8 +37,21 @@ def _dvc_pull(dry_run: bool):
             print(file)
         return
 
-    result = subprocess.run(["dvc", "pull", *files_to_pull], capture_output=True, text=True)
-    print(result)
+    proc = subprocess.Popen(
+        ["dvc", "pull", *files_to_pull], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+
+    while True:
+        assert proc.stdout is not None
+        line = proc.stdout.readline()
+
+        if line:
+            print(line.decode("utf-8").strip())
+            continue
+
+        if proc.poll() is not None:
+            break
+
 
 @click.command()
 @click.option("-d", "--dry-run", is_flag=True)
