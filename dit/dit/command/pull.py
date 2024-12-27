@@ -33,4 +33,3 @@ def _dvc_pull(dry_run: bool):
 def pull(dry_run: bool):
     _dvc_pull(dry_run)
     _git_pull(dry_run)
-
