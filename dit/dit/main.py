@@ -4,7 +4,7 @@ from .command import add, clean, scope, extension
 
 def main():
     parser = argparse.ArgumentParser("DitはGitとDVCを併用するためのツールです。")
-    subparser = parser.add_subparsers()
+    subparser = parser.add_subparsers(required=True)
 
     #add.register_subparser(subparser)
     #clean.register_subparser(subparser)

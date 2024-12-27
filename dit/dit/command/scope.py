@@ -20,14 +20,15 @@ def _list(args):
     for directory in natsorted(directories):
         print(directory)
 
+
 def _remove(args):
     scope = Scope()
     scope.remove_directory(args.directory)
 
+
 def register_subparser(root_parser):
     parser = root_parser.add_parser("scope")
     subparser = parser.add_subparsers()
-
 
     add_parser = subparser.add_parser("add", help="add directory to scope")
     add_parser.add_argument("directory", help="directory to add")
@@ -39,5 +40,3 @@ def register_subparser(root_parser):
     remove_parser = subparser.add_parser("remove", help="remove directory from scope")
     remove_parser.add_argument("directory", help="directory to remove")
     remove_parser.set_defaults(func=_remove)
-
-
