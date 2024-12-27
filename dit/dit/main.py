@@ -1,20 +1,17 @@
-import argparse
-from .command import add, clean, scope, extension
+import click
+from .command.scope import scope
+from .command.extension import ext
+
+@click.group()
+def cli():
+    pass
 
 
 def main():
-    parser = argparse.ArgumentParser("DitはGitとDVCを併用するためのツールです。")
-    subparser = parser.add_subparsers(dest="command",required=True)
+    cli.add_command(scope)
+    cli.add_command(ext)
 
-    #add.register_subparser(subparser)
-    #clean.register_subparser(subparser)
-    extension.register_subparser(subparser)
-    scope.register_subparser(subparser)
-
-    args = parser.parse_args()
-    args.func(args)
-    #add.handle(args)
-    #clean.handle(args)
+    cli()
 
 
 if __name__ == "__main__":

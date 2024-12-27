@@ -24,15 +24,16 @@ class Scope:
         logger.debug(f"patterns: {patterns}: {len(files)} files found")
         return files
 
-    def add_directory(self, dir_path: str):
+    def add(self, dir_path: str):
         Scope.directories.append(self._norm_path(dir_path))
         self._save_config()
         logger.debug(f"added {dir_path} to scope")
 
-    def remove_directory(self, dir_path: str):
+    def remove(self, dir_path: str):
+        assert os.path.isdir(dir_path), f"{dir_path} is not a directory"
         assert (
             self._norm_path(dir_path) in Scope.directories
-        ), f"{dir_path} is not in scope"
+        ), f"{self._norm_path(dir_path)} is not in scope. {Scope.directories}"
         Scope.directories.remove(self._norm_path(dir_path))
         self._save_config()
         logger.debug(f"removed {dir_path} from scope")
