@@ -4,6 +4,7 @@ from .command.extension import ext
 from .command.add import add
 from .command.commit import commit
 from .command.push import push
+from .command.pull import pull
 
 
 @click.group()
@@ -17,6 +18,7 @@ def main():
     cli.add_command(add)
     cli.add_command(commit)
     cli.add_command(push)
+    cli.add_command(pull)
 
     cli()
 
