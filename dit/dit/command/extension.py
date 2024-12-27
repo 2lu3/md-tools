@@ -32,7 +32,7 @@ def _list(args):
 
 def register_subparser(root_parser):
     parser = root_parser.add_parser("ext")
-    subparser = parser.add_subparsers()
+    subparser = parser.add_subparsers(required=True)
 
     add_parser = subparser.add_parser("add", help="新たに拡張子を追加する")
     add_parser.add_argument("extension", type=str, help="新たに加える拡張子", nargs="+")
