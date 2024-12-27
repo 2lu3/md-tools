@@ -16,7 +16,7 @@ def _git_pull(dry_run: bool):
 def _dvc_pull(dry_run: bool):
     files_to_pull = []
     dvc = DVC()
-    files_to_pull = dvc.find_dvc_files()
+    files_to_pull = dvc.find_dvc_files_in_scope()
 
     if dry_run:
         print("Dry run: dvc pull")
