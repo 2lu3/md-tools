@@ -12,6 +12,7 @@ class Scope:
 
     def __init__(self):
         self.git = Git()
+        self._load_config()
 
     def find_patterns(self, patterns: list[str]):
         files = []
@@ -37,7 +38,7 @@ class Scope:
         logger.debug(f"removed {dir_path} from scope")
 
     def _load_config(self):
-        config = Configuration(self.git.root_dir())
+        config = Configuration()
 
         directories: list[str] = config.load_config().get("directories", [])
         assert type(directories) == list
@@ -47,7 +48,7 @@ class Scope:
         return directories
 
     def _save_config(self):
-        config = Configuration(self.git.root_dir())
+        config = Configuration()
         config.update({"directories": Scope.directories})
 
     def _norm_path(self, path: str):

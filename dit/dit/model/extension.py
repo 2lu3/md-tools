@@ -25,12 +25,12 @@ class Extension:
 
     def _load(self):
         git = Git()
-        config = Configuration(git.root_dir())
+        config = Configuration()
         extensions: list[str] = config.load_config().get("extensions", [])
         assert type(extensions) == list
         return extensions
 
     def _save(self):
         git = Git()
-        config = Configuration(git.root_dir())
+        config = Configuration()
         config.update({"extensions": self.extensions})
