@@ -1,7 +1,7 @@
 import click
 import subprocess
 
-from dit.model.scope import Scope
+from dit.model.dvc import DVC
 
 
 def _git_pull(dry_run: bool):
@@ -15,8 +15,8 @@ def _git_pull(dry_run: bool):
 
 def _dvc_pull(dry_run: bool):
     files_to_pull = []
-    scope = Scope()
-    scope.find_patterns(["*.dvc"])
+    dvc = DVC()
+    files_to_pull = dvc.find_dvc_files()
 
     if dry_run:
         print("Dry run: dvc pull")

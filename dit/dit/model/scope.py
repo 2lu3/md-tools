@@ -14,16 +14,6 @@ class Scope:
         self.git = Git()
         self._load_config()
 
-    def find_patterns(self, file_patterns: list[str]):
-        files = []
-        for directory in Scope.directories:
-            for pattern in file_patterns:
-                files.extend(glob(os.path.join(directory, "**",pattern), recursive=True))
-
-        files = set(files)
-        logger.debug(f"patterns: {file_patterns}: {len(files)} files found")
-        return files
-
     def add(self, dir_path: str):
         Scope.directories.add(self._norm_path(dir_path))
         self._save_config()
