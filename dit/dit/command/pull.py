@@ -16,9 +16,9 @@ def _git_pull(dry_run: bool):
 def _dvc_pull(dry_run: bool):
     files_to_pull = []
     scope = Scope()
+    print("helloo")
     scope.find_patterns(["*.dvc"])
 
-    
     if dry_run:
         print("Dry run: dvc pull")
         print("Files to be pulled:")
@@ -32,10 +32,6 @@ def _dvc_pull(dry_run: bool):
 @click.command()
 @click.option("-d", "--dry-run", is_flag=True)
 def pull(dry_run: bool):
-    if dry_run:
-        print("Dry run")
-        return
-
     _dvc_pull(dry_run)
     _git_pull(dry_run)
 

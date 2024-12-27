@@ -16,7 +16,9 @@ class Scope:
 
     def find_patterns(self, file_patterns: list[str]):
         files = []
+        print("start")
         for directory in Scope.directories:
+            print(directory)
             for pattern in file_patterns:
                 logger.debug(f"searching {directory} for {pattern}")
                 new_files = glob(os.path.join(directory, "**", pattern), recursive=True)
