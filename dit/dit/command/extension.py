@@ -9,22 +9,22 @@ def ext():
 
 @ext.command()
 @click.argument("extension")
-def add(ext):
-    Extension().add(ext)
+def add(extension):
+    Extension().add(extension)
 
 @ext.command()
 @click.argument("extension")
-def remove(ext):
-    extension = Extension()
+def remove(extension):
+    ext_manager = Extension()
 
-    if not ext in extension.extensions:
+    if not extension in ext_manager.extensions:
         print(f"Error: 拡張子 {ext} は登録されていません")
         print("登録されているパターンは下の通りです")
-        for registered_ext in extension.extensions:
+        for registered_ext in ext_manager.extensions:
             print(registered_ext)
         return
 
-    extension.remove(ext)
+    ext_manager.remove(extension)
 
 
 @ext.command()
