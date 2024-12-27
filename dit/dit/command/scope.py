@@ -27,7 +27,7 @@ def _remove(args):
 
 def register_subparser(root_parser):
     parser = root_parser.add_parser("scope")
-    subparser = parser.add_subparsers()
+    subparser = parser.add_subparsers(dest="scope")
 
     add_parser = subparser.add_parser("add", help="add directory to scope")
     add_parser.add_argument("directory", help="directory to add")
