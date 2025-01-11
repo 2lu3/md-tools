@@ -23,7 +23,7 @@ def search_files(path_list: set[str]):
     return files_to_consider
 
 @click.command()
-@click.argument("path", nargs=-1)
+@click.argument("paths", nargs=-1)
 @click.option("-A", "--all", is_flag=True)
 @click.option("-d", "--dry-run", is_flag=True)
 def add(paths: tuple[str, ...], is_all: bool, dry_run: bool):
