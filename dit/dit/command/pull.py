@@ -11,14 +11,14 @@ def _git_pull(dry_run: bool):
         return
 
     proc = subprocess.Popen(
-        ["git", "pull"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ["git", "pull"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
     )
     while True:
         assert proc.stdout is not None
         line = proc.stdout.readline()
 
         if line:
-            print(line.decode("utf-8").strip())
+            print(line)
             continue
 
         if proc.poll() is not None:
@@ -38,7 +38,7 @@ def _dvc_pull(dry_run: bool):
         return
 
     proc = subprocess.Popen(
-        ["dvc", "pull", *files_to_pull], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ["dvc", "pull", *files_to_pull], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
     )
 
     while True:
@@ -46,7 +46,7 @@ def _dvc_pull(dry_run: bool):
         line = proc.stdout.readline()
 
         if line:
-            print(line.decode("utf-8").strip())
+            print(line)
             continue
 
         if proc.poll() is not None:
