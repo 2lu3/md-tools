@@ -37,7 +37,7 @@ def _dvc_pull(dry_run: bool):
             print(file)
         return
 
-    print(f"dvc pull {files_to_pull}")
+    print(f"dvc pull {" ".join(files_to_pull)}")
     return
 
     proc = subprocess.Popen(
