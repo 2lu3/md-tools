@@ -24,7 +24,7 @@ def search_files(path_list: set[str]):
 
 @click.command()
 @click.argument("paths", nargs=-1)
-@click.option("-A", "--all", is_flag=True)
+@click.option("-A", "--all-files", is_flag=True)
 @click.option("-d", "--dry-run", is_flag=True)
 def add(paths: tuple[str, ...], is_all: bool, dry_run: bool):
     files_to_consider = search_files(set(paths))
