@@ -55,7 +55,7 @@ def add(paths: tuple[str, ...], all_files: bool, dry_run: bool):
         return
 
     git_result = subprocess.run(["git", "add", " ".join(files_by_git)], capture_output=True, text=True)
-    print(git_result)
+    print(git_result.stdout)
     dvc_result = subprocess.run(["dvc", "add", " ".join(files_by_dvc)], capture_output=True, text=True)
-    print(dvc_result)
+    print(dvc_result.stdout)
 
