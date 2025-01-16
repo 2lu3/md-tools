@@ -1,6 +1,6 @@
-from typing import IO
 import click
 import subprocess
+import os
 
 from dit.model.dvc import DVC
 
@@ -56,5 +56,19 @@ def _dvc_pull(dry_run: bool):
 @click.command()
 @click.option("-d", "--dry-run", is_flag=True)
 def pull(dry_run: bool):
-    _dvc_pull(dry_run)
-    _git_pull(dry_run)
+    files_to_pull = DVC().find_dvc_files_in_scope()
+    with open("tmp_execute.sh", "w") as f:
+        f.write("#!/bin/bash\n")
+
+        f.write("git pull\n")
+
+        f.write("dvc pull ")
+        for file in files_to_pull:
+            f.write(file + " ")
+        f.write("\n")
+
+    if dry_run:
+        subprocess.run(["cat", "tmp_execute.sh"])
+    else:
+        subprocess.run(["bash", "tmp_execute.sh"])
+    os.remove("tmp_execute.sh")
