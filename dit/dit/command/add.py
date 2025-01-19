@@ -44,18 +44,13 @@ def add(paths: tuple[str, ...], all_files: bool, dry_run: bool):
         else:
             files_by_git.append(file)
 
+    with open("tmp_execute.sh", "w") as f:
+        f.write(f"""#!/bin/bash\n
+git add {" ".join(files_by_git)}
+dvc add {" ".join(files_by_dvc)}""")
+
     if dry_run:
-        print("Dry run")
-        print("Files to be added to git:")
-        for file in files_by_git:
-            print(file)
-        print("Files to be added to dvc:")
-        for file in files_by_dvc:
-            print(file)
-        return
-
-    git_result = subprocess.run(["git", "add", " ".join(files_by_git)], capture_output=True, text=True)
-    print(git_result.stdout)
-    dvc_result = subprocess.run(["dvc", "add", " ".join(files_by_dvc)], capture_output=True, text=True)
-    print(dvc_result.stdout)
-
+        subprocess.run(["cat", "tmp_execute.sh"])
+    else:
+        subprocess.run(["bash", "tmp_execute.sh"])
+    os.remove("tmp_execute.sh")
