@@ -18,8 +18,9 @@ def search_files(path_list: set[str]):
         if os.path.isfile(path):
             files_to_consider.append(path)
         else:
-            for file in glob.glob(os.path.join(path, "**", "*"), recursive=True):
-                files_to_consider.append(file)
+            files_to_consider.extend(
+                glob.glob(os.path.join(path, "**", "*"), recursive=True)
+                )
     return files_to_consider
 
 @click.command()
@@ -30,9 +31,7 @@ def add(paths: tuple[str, ...], all_files: bool, dry_run: bool):
     files_to_consider = search_files(set(paths))
     if all_files:
         scope = Scope()
-        files_to_consider.extend(
-                search_files(scope.directories)
-                )
+        files_to_consider.extend( search_files(scope.directories))
 
     extension = Extension()
     files_by_git = []
@@ -45,9 +44,11 @@ def add(paths: tuple[str, ...], all_files: bool, dry_run: bool):
             files_by_git.append(file)
 
     with open("tmp_execute.sh", "w") as f:
-        f.write(f"""#!/bin/bash\n
-git add {" ".join(files_by_git)}
-dvc add {" ".join(files_by_dvc)}""")
+        f.write("#!/bin/bash\n")
+        if files_by_git:
+            f.write(f"git add {' '.join(files_by_git)}\n")
+        if files_by_dvc:
+            f.write(f"dvc add {' '.join(files_by_dvc)}\n")
 
     if dry_run:
         subprocess.run(["cat", "tmp_execute.sh"])

@@ -20,7 +20,7 @@ class Scope:
         logger.debug(f"added {dir_path} to scope")
 
     def remove(self, dir_path: str):
-        assert os.path.isdir(dir_path), f"{dir_path} is not a directory"
+        #assert os.path.isdir(dir_path), f"{dir_path} is not a directory"
         assert (
             self._norm_path(dir_path) in Scope.directories
         ), f"{self._norm_path(dir_path)} is not in scope. {Scope.directories}"
