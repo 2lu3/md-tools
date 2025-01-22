@@ -68,7 +68,7 @@ def analyze_minimizations(
     ax_all.legend()
 
     ax_half = fig.add_subplot(122)
-    for name, step, potential_energy in zip(names, steps, potential_energies):
+    for name, step, potential_energy in zip(project_names, steps, potential_energies):
         half_index = len(step) // 2
         step = step[half_index:]
         potential_energy = potential_energy[half_index:]
@@ -107,6 +107,7 @@ def command():
     args = parser.parse_args()
     fig = analyze_minimizations(
         args.project_dirs,
+        None,
         args.use_moving_average,
         args.window_size,
         tuple([args.figsize[0], args.figsize[1]]),
