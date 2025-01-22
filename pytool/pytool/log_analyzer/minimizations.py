@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from typing import Optional
 from loguru import logger
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -11,6 +12,7 @@ from .common.reader import read_column_by_name
 
 def analyze_minimizations(
     project_dirs: list[str],
+    project_names: Optional[list[str]] = None,
     use_moving_average: bool = False,
     window_size: int = 10,
     figsize: tuple[int, int] = (12, 6),
@@ -24,7 +26,9 @@ def analyze_minimizations(
     Returns:
         Figure:
     """
-    names = []
+
+    if project_names is None:
+        project_names = [os.path.basename(os.path.normpath(project_dir)) for project_dir in project_dirs]
     steps: list[list[int]] = []
     potential_energies: list[list[float]] = []
     for project_dir in project_dirs:
@@ -38,14 +42,13 @@ def analyze_minimizations(
         step = list(map(int, step))
         potential_energy = list(map(float, potential_energy))
 
-        names.append(os.path.basename(os.path.normpath(project_dir)))
         steps.append(step)
         potential_energies.append(potential_energy)
 
     fig: Figure = plt.figure(figsize=figsize)
     ax_all = fig.add_subplot(121)
 
-    for name, step, potential_energy in zip(names, steps, potential_energies):
+    for name, step, potential_energy in zip(project_names, steps, potential_energies):
         ax_all.plot(step, potential_energy, label=name)
 
         if use_moving_average:
