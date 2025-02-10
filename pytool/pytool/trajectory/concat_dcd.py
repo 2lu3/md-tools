@@ -8,6 +8,7 @@ import MDAnalysis as mda
 import math
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 
@@ -37,14 +38,20 @@ def _glob_dcd(dcds: list[str]):
             logger.warning(f"Cannot find dir/file {dcd_path}")
     return result
 
-def concat_dcd(topology: str,dcds: list[str], output_name: str, dt_ratios: Optional[list[int]] = None):
+
+def concat_dcd(
+    topology: str,
+    dcds: list[str],
+    output_name: str,
+    dt_ratios: Optional[list[int]] = None,
+):
     """Concatenate DCD files
 
     Args:
         dcds (list[str]): A list of DCD files
         output_name (str): Output file name
     """
-    logger.info(f"Concatenating {len(dcds)} DCD files to {output_name}")
+    logger.debug(f"Concatenating {len(dcds)} DCD files to {output_name}")
 
     u = mda.Universe(topology)
 
@@ -68,8 +75,20 @@ def main():
 
     parser.add_argument("topology", type=str, help="Topology file")
     parser.add_argument("dcds", nargs="+", help="DCD files or dirs")
-    parser.add_argument("-o", "--output", default="concat.dcd", help="Output file name. Default: concat.dcd")
-    parser.add_argument("-r" ,"--dt-ratios", nargs="+", type=int, default=None,help="DT ratios for each DCD file. Default: None")
+    parser.add_argument(
+        "-o",
+        "--output",
+        default="concat.dcd",
+        help="Output file name. Default: concat.dcd",
+    )
+    parser.add_argument(
+        "-r",
+        "--dt-ratios",
+        nargs="+",
+        type=int,
+        default=None,
+        help="DT ratios for each DCD file. Default: None",
+    )
 
     args = parser.parse_args()
     logger.debug(args)
@@ -84,4 +103,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
