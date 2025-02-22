@@ -16,7 +16,7 @@ def align(
 ):
     alignto(mobile, ref, select=select, weights="mass")
 
-    output = mda.Writer(output_path, u1.atoms.n_atoms)  # type: ignore
+    output = mda.Writer(output_path, mobile.atoms.n_atoms)  # type: ignore
     output.write(mobile.atoms)
 
 
