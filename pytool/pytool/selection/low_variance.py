@@ -126,7 +126,6 @@ def plot_rmsf(num_candidates_list, avg_rmsf_list, png_path: str):
     plt.close()
 
 
-
 def calc_low_variance(positions: np.ndarray) -> tuple[list[float], list[np.ndarray]]:
     candidate_mask_list: list[np.ndarray] = []
     avg_rmsf_list: list[float] = []
@@ -177,7 +176,7 @@ def calc_low_variance_residues(
 
     result: list[tuple[float, list[str]]] = []
     for candidate, rmsf in zip(candidate_masks, avg_rmsfs):
-        residues = [resid[candidate] for resid in resids]
+        residues = list(map(str, resids[0][candidate]))
         result.append((rmsf, residues))
 
     return result
