@@ -67,8 +67,7 @@ def align_positions(positions):
     """
     n_frames = positions.shape[0]
     aligned_positions = np.empty_like(positions)
-    # 最初のフレームを参照構造とする
-    ref = np.mean(positions[0], axis=0)
+    ref = np.mean(positions, axis=0)
 
     for i in range(n_frames):
         P = positions[i]
