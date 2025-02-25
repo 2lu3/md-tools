@@ -3,6 +3,7 @@ import os
 from natsort import natsorted
 import subprocess
 import shutil
+from alive_progress import alive_bar
 
 from dit.model.extension import Extension
 from dit.model.git import Git
@@ -46,7 +47,9 @@ class DVC:
         scope_files = self.find_dvc_files_in_scope()
         files = set(all_files) - set(scope_files)
 
-        for file in files:
-            large_file = os.path.splitext(file)[0]
-            if os.path.exists(large_file):
-                os.remove(large_file)
+        with alive_bar(len(files)) as bar:
+            for file in files:
+                large_file = os.path.splitext(file)[0]
+                if os.path.exists(large_file):
+                    os.remove(large_file)
+                bar()
