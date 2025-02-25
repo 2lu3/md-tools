@@ -41,7 +41,7 @@ class DVC:
 
         # delete cache
         process = subprocess.Popen(
-            ["dvc", "gc", "-w", "--not-in-remote"],
+            ["dvc", "gc", "-w", "--not-in-remote", "-f"],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True  # Python3.7以降なら、universal_newlines=TrueでもOK
