@@ -40,7 +40,20 @@ class DVC:
         """cacheを全て削除し、scope以外のdvc管理下の実態ファイルを削除する"""
 
         # delete cache
-        subprocess.run(["dvc", "gc", "-w", "--not-in-remote"], capture_output=True, text=True)
+        process = subprocess.Popen(
+            ["dvc", "gc", "-w", "--not-in-remote"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True  # Python3.7以降なら、universal_newlines=TrueでもOK
+        )
+        
+        # 出力を1行ずつ読みながらprint
+        while True:
+            output = process.stdout.readline() # type: ignore
+            if output == "" and process.poll() is not None:
+                break
+            if output:
+                print(output.strip())
 
         # delete files
         all_files = self.find_dvc_files_in_project()
