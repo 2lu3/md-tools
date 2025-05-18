@@ -47,8 +47,8 @@ def align_trajectory(
 @click.option("--out", "-o", help="Path to output file", required=True)
 @click.option("--select", help="Selection string", default="protein and name CA")
 def align_trajectory_to_command(
-    structure: str, trajectory: str, output_path: str, select: str = "protein and name CA"
+    structure: str, trajectory: str, out: str, select: str = "protein and name CA"
 ):
     align_trajectory(
-        mda.Universe(structure, trajectory), mda.Universe(structure), output_path, select
+        mda.Universe(structure, trajectory), mda.Universe(structure), out, select
     )
