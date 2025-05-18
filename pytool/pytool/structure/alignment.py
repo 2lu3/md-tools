@@ -42,13 +42,13 @@ def align_trajectory(
 
 
 @click.command()
-@click.option("--pdb_path", "-p", help="Path to PDB file", required=True)
-@click.option("--dcd_path", "-d", help="Path to DCD file", required=True)
-@click.option("--output_path", "-o", help="Path to output file", required=True)
-@click.option("--select", "-s", help="Selection string", default="protein and name CA")
+@click.option("--structure", "-s", help="Path to PDB file", required=True)
+@click.option("--trajectory", "-t", help="Path to DCD file", required=True)
+@click.option("--out", "-o", help="Path to output file", required=True)
+@click.option("--select", help="Selection string", default="protein and name CA")
 def align_trajectory_to_command(
-    pdb_path: str, dcd_path: str, output_path: str, select: str = "protein and name CA"
+    structure: str, trajectory: str, output_path: str, select: str = "protein and name CA"
 ):
     align_trajectory(
-        mda.Universe(pdb_path, dcd_path), mda.Universe(pdb_path), output_path, select
+        mda.Universe(structure, trajectory), mda.Universe(structure), output_path, select
     )
