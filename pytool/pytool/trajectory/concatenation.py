@@ -61,5 +61,5 @@ def concat_dcd(
     with mda.Writer(output_name, u.atoms.n_atoms) as W:
         for dcd_path in dcd_paths:
             u.load_new(dcd_path)
-            for ts in u.trajectory:
-                W.write(ts)
+            for _ in u.trajectory:
+                W.write(u.atoms)
