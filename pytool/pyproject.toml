@@ -36,8 +36,6 @@ atom-distance = "pytool.structure.atom_distance:atom_distance_to_command"
 rmsd = "pytool.structure.rmsd:rmsd_to_command"
 rmsd-trajectory = "pytool.structure.rmsd:rmsd_trajectory_to_command"
 get-boxsize = 'pytool.structure.get_box_size:get_box_size_to_command'
-align = 'pytool.structure.alignment:align_to_command'
-align-trajectory='pytool.structure.alignment:align_trajectory_to_command'
 
 # trajectory
 concat-dcd = "pytool.trajectory.__init__:concat_dcd"
