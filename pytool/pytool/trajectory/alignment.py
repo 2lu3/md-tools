@@ -8,12 +8,12 @@ warnings.filterwarnings("ignore")
 
 
 def align(
-    mobile: mda.Universe,
-    ref: mda.Universe,
+    mobile: str,
+    ref: str,
     output_path: str,
     select: str = "protein and name CA",
 ):
-    alignto(mobile, ref, select=select, weights="mass")
+    alignto(mda.Universe(mobile), mda.Universe(ref), select=select, weights="mass")
 
     output = mda.Writer(output_path, mobile.atoms.n_atoms)  # type: ignore
     output.write(mobile.atoms)
