@@ -24,4 +24,4 @@ def align_trajectory(
     select: str = "protein and name CA",
     verbose: bool = True,
 ):
-    AlignTraj(mobile, ref, select=select, filename=output_path, verbose=verbose).run()
+    AlignTraj(molbile, ref, select=select, filename=output_path, verbose=verbose).run()

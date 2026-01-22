@@ -27,10 +27,10 @@ def _glob_dcd(dcds: list[str]):
         if os.path.isdir(dcd_path):
             dcd_files = glob(os.path.join(dcd_path, "**", "*.dcd"), recursive=True)
             result.extend(natsorted(dcd_files))
-            logger.info(f"Found {len(dcd_files)} DCD files in {dcd_path}")
+            logger.debug(f"Found {len(dcd_files)} DCD files in {dcd_path}")
         elif os.path.isfile(dcd_path):
             result.append(dcd_path)
-            logger.info(f"Found {dcd_path}")
+            logger.debug(f"Found {dcd_path}")
         else:
             logger.warning(f"Cannot find dir/file {dcd_path}")
     return result
