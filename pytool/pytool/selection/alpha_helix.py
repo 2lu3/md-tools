@@ -1,8 +1,6 @@
 import MDAnalysis as mda
 from MDAnalysis.analysis.dssp import DSSP, translate
 import warnings
-import japanize_matplotlib
-import matplotlib.pyplot as plt
 
 warnings.filterwarnings("ignore")
 
