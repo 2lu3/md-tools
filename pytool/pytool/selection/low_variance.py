@@ -3,8 +3,6 @@ import MDAnalysis as mda
 import warnings
 import numpy as np
 from loguru import logger
-import japanize_matplotlib
-import matplotlib.pyplot as plt
 
 warnings.filterwarnings("ignore")
 
@@ -94,36 +92,6 @@ def compute_rmsf(aligned_positions):
     rmsf = np.sqrt(np.mean(squared_diffs, axis=0))  # shape: (n_residues,)
     return rmsf
 
-
-def plot_delta_rmsf(num_candidates_list, avg_rmsf_list, png_path: str):
-    # 平均RMSFの変化量を計算
-    delta_rmsf = np.diff(avg_rmsf_list)
-    # x軸は候補数の中央付近に対応させる
-    x_vals = (
-        np.array(num_candidates_list[:-1]) + np.array(num_candidates_list[1:])
-    ) / 2
-
-    plt.figure(figsize=(12, 8))
-    plt.plot(x_vals, delta_rmsf, marker="o")
-    plt.xlabel("Number of Candidate Residues")
-    plt.ylabel("Delta Average RMSF (Å)")
-    plt.title("RMSFの変化量")
-    plt.gca().invert_xaxis()
-    plt.grid(True)
-    plt.savefig(png_path)
-    plt.close()
-
-
-def plot_rmsf(num_candidates_list, avg_rmsf_list, png_path: str):
-    plt.figure(figsize=(12, 8))
-    plt.plot(num_candidates_list, avg_rmsf_list, marker="o")
-    plt.xlabel("Number of Candidate Residues")
-    plt.ylabel("Average RMSF (Å)")
-    plt.title("RMSFの候補残基数依存性")
-    plt.gca().invert_xaxis()  # 候補数が減少するのでX軸を反転
-    plt.grid(True)
-    plt.savefig(png_path)
-    plt.close()
 
 
 def calc_low_variance(positions: np.ndarray) -> tuple[list[float], list[np.ndarray]]:
