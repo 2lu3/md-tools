@@ -1,5 +1,5 @@
 from .minimization import analyze_minimization
-from .equilibration import analyze_equilibration
+from .equilibration import analyze_equilibration, EquilPlotParams
 from .production import analyze_production
 from .minimizations import analyze_minimizations
 from .equilibrations import analyze_equilibrations

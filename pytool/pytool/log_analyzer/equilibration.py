@@ -9,12 +9,12 @@ from .common.log_glob import glob_log_files
 from .common.reader import read_log
 
 @dataclass
-class Equil:
+class EquilPlotParams:
     log_paths: list[str]
     condition_name: str
 
 def analyze_equilibration(
-    equil_list: list[Equil],
+    equil_list: list[EquilPlotParams],
     save_path_generator: Callable[[str], str],
     window_size=10,
     popup: bool = False,
@@ -23,7 +23,7 @@ def analyze_equilibration(
     analyze_equilibration.
 
     Args:
-        equil_list (list[Equil]): equil_list
+        equil_list (list[EquilPlotParams]): equil_list
         condition_names (list[str]): condition_names
         save_path_generator (Callable[[str], str]): df gen(feature_name) -> path
         window_size (int): window_size
