@@ -1,121 +1,96 @@
 from typing import Optional
+import pandas as pd
 from matplotlib import pyplot as plt
 
-from .reader import read_column_by_name
+from .reader import read_column_by_name, read_log
 
 
-def apply_window_size(x: list[float], window_size: int):
+def plot_box_sizes(
+    df_list: list[pd.DataFrame], condition_names: list[str], output_path: str
+):
+    fig = plt.figure()
+
+    for i, label, column_name in enumerate(
+        [("X", "BOXX"), ("Y", "BOXY"), ("Z", "BOXZ")]
+    ):
+        ax = fig.add_subplot(3, 1, i + 1)
+        ax.set_xlabel("Time (ps)")
+        ax.set_ylabel(f"Box size (Å)")
+        ax.set_title(f"Box size {label}")
+
+        for df in df_list:
+            x = df["TIME"]
+            y = df[column_name]
+
+            ax.plot(x, y, label=condition_names[i])
+
+        ax.legend()
+
+    fig.savefig(output_path)
+
+
+def plot_pressure(
+    df_list: list[pd.DataFrame],
+    condition_names: list[str],
+    output_path: str,
+    window_size: Optional[int] = None,
+):
+    fig, ax = plt.subplots()
+    ax.set_xlabel("Time (ps)")
+    ax.set_ylabel("Pressure (bar)")
+    ax.set_title("Pressure")
+
+    for condition_name in condition_names:
+        for df in df_list:
+            pressure = df["PRESSURE"] if window_size is None else _apply_window_size(df["PRESSURE"], window_size)
+            ax.plot(df["TIME"], pressure, label=condition_name)
+
+    ax.legend()
+    fig.savefig(output_path)
+
+
+def plot_temperature(
+    df_list: list[pd.DataFrame],
+    condition_names: list[str],
+    output_path: str,
+    window_size: Optional[int] = None,
+):
+    fig, ax = plt.subplots()
+    ax.set_xlabel("Time (ps)")
+    ax.set_ylabel("Temperature (K)")
+    ax.set_title("Temperature")
+
+    for condition_name in condition_names:
+        for df in df_list:
+            temperature = df["TEMPERATURE"] if window_size is None else _apply_window_size(df["TEMPERATURE"], window_size)
+            ax.plot(df["TIME"], temperature, label=condition_name)
+
+    ax.legend()
+    fig.savefig(output_path)
+
+def plot_potential_energy(
+    df_list: list[pd.DataFrame],
+    condition_names: list[str],
+    output_path: str,
+    window_size: Optional[int] = None,
+):
+
+    fig, ax = plt.subplots()
+    ax.set_xlabel("Time (ps)")
+    ax.set_ylabel("Potential Energy (kJ/mol)")
+    ax.set_title("Potential Energy")
+
+    for condition_name in condition_names:
+        for df in df_list:
+            potential_energy = df["POTENTIAL_ENE"] if window_size is None else _apply_window_size(df["POTENTIAL_ENE"], window_size)
+            ax.plot(df["TIME"], potential_energy, label=condition_name)
+
+    ax.legend()
+    fig.savefig(output_path)
+
+
+def _apply_window_size(x: list[float], window_size: int):
     result: list[float] = []
     for i in range(len(x) - window_size):
         result.append(sum(x[i : i + window_size]) / window_size)
     return result
-
-
-def plot_2dline(
-    log_paths: list[str],
-    output_path: str,
-    x_name: str,
-    y_name: str,
-    title: str,
-    x_label: str,
-    y_label: str,
-    window_size: Optional[int]= None,
-):
-    x = read_column_by_name(log_paths, x_name)
-    y = read_column_by_name(log_paths, y_name)
-
-    fig: plt.Figure = plt.figure()  # type: ignore
-    ax: plt.Axes = fig.add_subplot(1, 1, 1)
-
-    if window_size is not None:
-        ax.plot(x, y, label="Raw")
-        ax.plot(x[window_size:], apply_window_size(y, window_size), label="Moving average")
-        ax.legend()
-    else:
-        ax.plot(x, y)
-
-    ax.set_xlabel(x_label)
-    ax.set_ylabel(y_label)
-    ax.set_title(title)
-
-    fig.savefig(output_path)
-
-
-def plot_box_sizes(log_paths: list[str], output_path: str, project_name: str):
-    x = read_column_by_name(log_paths, "TIME")
-    y_x = read_column_by_name(log_paths, "BOXX")
-    y_y = read_column_by_name(log_paths, "BOXY")
-    y_z = read_column_by_name(log_paths, "BOXZ")
-    data_list = [
-        ("X", y_x),
-        ("Y", y_y),
-        ("Z", y_z),
-    ]
-
-    fig: plt.Figure = plt.figure()  # type: ignore
-    for i, data in enumerate(data_list):
-        ax: plt.Axes = fig.add_subplot(3, 1, i + 1)
-        ax.plot(x, data[1])
-        ax.set_xlabel("Time (ps)")
-        ax.set_ylabel(f"Box size (Å)")
-        ax.set_title(f"{data[0]} Box size of {project_name}")
-
-    fig.savefig(output_path)
-
-
-def plot_pressure(log_paths: list[str], output_path: str, project_name: str, window_size: Optional[int]):
-    plot_2dline(
-        log_paths,
-        output_path,
-        "TIME",
-        "PRESSURE",
-        f"Pressure of {project_name}",
-        "Time (ps)",
-        "Pressure (bar)",
-        window_size,
-    )
-
-
-def plot_temperature(log_paths: list[str], output_path: str, project_name: str, window_size: Optional[int]):
-    plot_2dline(
-        log_paths,
-        output_path,
-        "TIME",
-        "TEMPERATURE",
-        f"Temperature of {project_name}",
-        "Time (ps)",
-        "Temperature (K)",
-        window_size,
-    )
-
-
-def plot_total_energy(log_paths: list[str], output_path: str, project_name: str, window_size: Optional[int], x_name: str = "TIME"):
-    plot_2dline(
-        log_paths,
-        output_path,
-        x_name,
-        "TOTAL_ENE",
-        f"Total Energy of {project_name}",
-        "Time (ps)",
-        "Energy (kJ/mol)",
-        window_size,
-    )
-    
-def plot_potential_energy(log_paths: list[str], output_path: str, project_name: str, window_size: Optional[int], x_name: str = "TIME"):
-    plot_2dline(
-        log_paths,
-        output_path,
-        x_name,
-        "POTENTIAL_ENE",
-        f"Potential Energy of {project_name}",
-        "Time (ps)",
-        "Energy (kJ/mol)",
-        window_size,
-    )
-
-
-
-
-
-
-

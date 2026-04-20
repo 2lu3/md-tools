@@ -1,54 +1,67 @@
+from dataclasses import dataclass
 import click
-import os
 from loguru import logger
+from typing import Callable
 
 from .common.plot import plot_box_sizes, plot_pressure, plot_temperature, plot_total_energy
 from .common.log_glob import glob_log_files
+from .common.reader import read_log
 
+@dataclass
+class Equil:
+    log_paths: list[str]
+    condition_name: str
 
 def analyze_equilibration(
-    log_path: str,
-    savename: str = "equil",
+    equil_list: list[Equil],
+    save_path_generator: Callable[[str], str],
     window_size=10,
     popup: bool = False,
 ):
-    log_files = glob_log_files(log_path)
+    """
+    analyze_equilibration.
 
-    logger.info(f"Found {len(log_files)} log files")
+    Args:
+        equil_list (list[Equil]): equil_list
+        condition_names (list[str]): condition_names
+        save_path_generator (Callable[[str], str]): df gen(feature_name) -> path
+        window_size (int): window_size
+        popup (bool): popup
+    """
 
-    for log_file in log_files:
-        logger.info(f"Processing {log_file}")
-        basename = os.path.basename(log_file).split(".")[0]
+    df_list: list[pd.DataFrame] = []
+    for equil in equil_list:
+        df_list.append(read_log(equil.log_paths))
 
-        try:
-            plot_total_energy([log_file], f"total_energy_{savename}_{basename}", basename, window_size, "TIME")
-            logger.info(f"Saved Total Energy")
-        except ValueError as e:
-            logger.warning(f"Could not plot Total Energy for {log_file}")
-            logger.debug(e)
+    condition_names: list[str] = [equil.condition_name for equil in equil_list]
 
-        try:
-            plot_temperature([log_file], f"temperature_{savename}_{basename}", basename, window_size)
-            logger.info(f"Saved Temperature")
-        except ValueError as e:
-            logger.warning(f"Could not plot Temperature for {log_file}")
-            logger.debug(e)
+    try:
+        logger.info(f"Plotting Total Energy")
+        plot_total_energy(df_list, condition_names, save_path_generator("total_energy"), window_size)
+    except ValueError as e:
+        logger.warning(f"Could not plot Total Energy: {e}")
+        logger.debug(e)
 
-        try:
-            plot_box_sizes([log_file], f"box_sizes_{savename}_{basename}", basename)
-            logger.info(f"Saved Box Sizes")
-        except ValueError as e:
-            logger.warning(f"Could not plot Box Sizes for {log_file}")
-            logger.debug(e)
+    try:
+        logger.info(f"Plotting Temperature")
+        plot_temperature(df_list, condition_names, save_path_generator("temperature"), window_size)
+    except ValueError as e:
+        logger.warning(f"Could not plot Temperature: {e}")
+        logger.debug(e)
 
-        try:
-            plot_pressure([log_file], f"pressure_{savename}_{basename}", basename, window_size)
-            logger.info(f"Saved Pressure")
-        except ValueError as e:
-            logger.warning(f"Could not plot Pressure for {log_file}")
-            logger.debug(e)
+    try:
+        logger.info(f"Plotting Box Sizes")
+        plot_box_sizes(df_list, condition_names, save_path_generator("box_sizes"))
+    except ValueError as e:
+        logger.warning(f"Could not plot Box Sizes: {e}")
+        logger.debug(e)
 
-    logger.info(f"Saved all plots")
+    try:
+        logger.info(f"Plotting Pressure")
+        plot_pressure(df_list, condition_names, save_path_generator("pressure"), window_size)
+    except ValueError as e:
+        logger.warning(f"Could not plot Pressure: {e}")
+        logger.debug(e)
 
     if popup:
         import matplotlib.pyplot as plt
