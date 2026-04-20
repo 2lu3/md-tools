@@ -88,6 +88,25 @@ def plot_potential_energy(
     ax.legend()
     fig.savefig(output_path)
 
+def plot_total_energy(
+    df_list: list[pd.DataFrame],
+    condition_names: list[str],
+    output_path: str,
+    window_size: Optional[int] = None,
+):
+    fig, ax = plt.subplots()
+    ax.set_xlabel("Time (ps)")
+    ax.set_ylabel("Total Energy (kJ/mol)")
+    ax.set_title("Total Energy")
+
+    for condition_name in condition_names:
+        for df in df_list:
+            total_energy = df["TOTAL_ENE"] if window_size is None else _apply_window_size(df["TOTAL_ENE"], window_size)
+            ax.plot(df["TIME"], total_energy, label=condition_name)
+
+    ax.legend()
+    fig.savefig(output_path)
+
 
 def _apply_window_size(x: list[float], window_size: int):
     result: list[float] = []
