@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import click
 from loguru import logger
+import pandas as pd
 from typing import Callable
 
 from .common.plot import plot_box_sizes, plot_pressure, plot_temperature, plot_total_energy
