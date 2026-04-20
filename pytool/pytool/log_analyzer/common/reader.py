@@ -56,10 +56,13 @@ def _read_column_names(log_paths: list[str]):
 
             elements = [x for x in line.split(" ") if x != ""]
 
-            if column_names.
-            column_names.add(elements[1:])
-    assert len(column_names) == 1, "Column names are not consistent"
-    return list(column_names)[0]
+            names = elements[1:]
+
+            if len(column_names) == 0:
+                column_names = names
+            else:
+                assert column_names == names, "Column names are not consistent"
+    return list(column_names)
 
 
 def _read_info_lines(log_paths: list[str]) -> list[list[str]]:
