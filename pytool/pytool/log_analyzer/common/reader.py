@@ -1,3 +1,4 @@
+from tarfile import LENGTH_NAME
 from loguru import logger
 import pandas as pd
 
@@ -47,7 +48,7 @@ def _is_numeric_row(row: str):
 
 
 def _read_column_names(log_paths: list[str]):
-    column_names: set[list[str]] = set()
+    column_names: set[str] = set()
     for lines in _read_info_lines(log_paths):
         for line in lines:
             if _is_numeric_row(line):
@@ -55,8 +56,8 @@ def _read_column_names(log_paths: list[str]):
 
             elements = [x for x in line.split(" ") if x != ""]
 
+            if column_names.
             column_names.add(elements[1:])
-
     assert len(column_names) == 1, "Column names are not consistent"
     return list(column_names)[0]
 
