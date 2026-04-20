@@ -7,7 +7,7 @@ from itertools import cycle
 from matplotlib import cm
 from natsort import natsorted
 from .log_glob import glob_log_files
-from .reader import read_column_by_name, read_column_names
+from .reader import read_log
 
 linestyles = ["-", "--", "-.", ":"]
 
@@ -25,11 +25,12 @@ def read_column(project_dir: str, column_name: str) -> Data:
         value={},
     )
     for log_file in glob_log_files(project_dir):
-        if column_name not in read_column_names([log_file]):
+        df = read_log([log_file])
+        if column_name not in df.columns:
             continue
         log_name = os.path.basename(os.path.normpath(log_file))
-        time = list(map(int, read_column_by_name([log_file], "TIME")))
-        value = list(map(float, read_column_by_name([log_file], column_name)))
+        time = list(map(int, df["TIME"]))
+        value = list(map(float, df[column_name]))
 
         data.time[log_name] = time
         data.value[log_name] = value

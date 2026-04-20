@@ -10,7 +10,7 @@ import numpy as np
 from dataclasses import dataclass
 
 from .common.log_glob import glob_log_files
-from .common.reader import read_column_by_name, read_column_names
+from .common.reader import read_log
 from .common.fig_by_column import fig_by_column
 
 linestyles = ["-", "--", "-.", ":"]
@@ -40,14 +40,15 @@ def analyze_box_sizes(
         )
 
         for log_file in glob_log_files(project_dir):
-            if "BOXX" not in read_column_names([log_file]):
+            df = read_log([log_file])
+            if "BOXX" not in df.columns:
                 continue
 
             log_name = os.path.basename(os.path.normpath(log_file))
-            time = list(map(int, read_column_by_name([log_file], "TIME")))
-            x = list(map(float, read_column_by_name([log_file], "BOXX")))
-            y = list(map(float, read_column_by_name([log_file], "BOXY")))
-            z = list(map(float, read_column_by_name([log_file], "BOXZ")))
+            time = list(map(int, df["TIME"]))
+            x = list(map(float, df["BOXX"]))
+            y = list(map(float, df["BOXY"]))
+            z = list(map(float, df["BOXZ"]))
 
             data.time[log_name] = time
             data.x[log_name] = x
