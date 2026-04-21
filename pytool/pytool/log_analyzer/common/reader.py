@@ -27,7 +27,7 @@ def read_log(log_paths: list[str]) -> pd.DataFrame:
 
                 elements = [x for x in line.split(" ") if x != ""]
 
-                df = pd.concat([df, pd.Series(
+                df = pd.concat([df, pd.DataFrame(
                         [[float(element) for element in elements[1:]]], columns=df.columns
                     )], ignore_index=True)
 
