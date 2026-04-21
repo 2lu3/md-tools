@@ -42,8 +42,9 @@ def plot_pressure(
 
     for condition_name in condition_names:
         for df in df_list:
+            time = df["TIME"] if window_size is None else _apply_window_size(df["TIME"], window_size)
             pressure = df["PRESSURE"] if window_size is None else _apply_window_size(df["PRESSURE"], window_size)
-            ax.plot(df["TIME"], pressure, label=condition_name)
+            ax.plot(time, pressure, label=condition_name)
 
     ax.legend()
     fig.savefig(output_path)
@@ -62,8 +63,9 @@ def plot_temperature(
 
     for condition_name in condition_names:
         for df in df_list:
+            time = df["TIME"] if window_size is None else _apply_window_size(df["TIME"], window_size)
             temperature = df["TEMPERATURE"] if window_size is None else _apply_window_size(df["TEMPERATURE"], window_size)
-            ax.plot(df["TIME"], temperature, label=condition_name)
+            ax.plot(time, temperature, label=condition_name)
 
     ax.legend()
     fig.savefig(output_path)
@@ -82,8 +84,9 @@ def plot_potential_energy(
 
     for condition_name in condition_names:
         for df in df_list:
+            time = df["TIME"] if window_size is None else _apply_window_size(df["TIME"], window_size)
             potential_energy = df["POTENTIAL_ENE"] if window_size is None else _apply_window_size(df["POTENTIAL_ENE"], window_size)
-            ax.plot(df["TIME"], potential_energy, label=condition_name)
+            ax.plot(time, potential_energy, label=condition_name)
 
     ax.legend()
     fig.savefig(output_path)
@@ -102,7 +105,8 @@ def plot_total_energy(
     for condition_name in condition_names:
         for df in df_list:
             total_energy = df["TOTAL_ENE"] if window_size is None else _apply_window_size(df["TOTAL_ENE"], window_size)
-            ax.plot(df["TIME"], total_energy, label=condition_name)
+            time = df["TIME"] if window_size is None else _apply_window_size(df["TIME"], window_size)
+            ax.plot(time, total_energy, label=condition_name)
 
     ax.legend()
     fig.savefig(output_path)
