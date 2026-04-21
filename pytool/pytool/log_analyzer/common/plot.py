@@ -10,7 +10,7 @@ def plot_box_sizes(
 ):
     fig = plt.figure()
 
-    for i, label, column_name in enumerate(
+    for i, (label, column_name) in enumerate(
         [("X", "BOXX"), ("Y", "BOXY"), ("Z", "BOXZ")]
     ):
         ax = fig.add_subplot(3, 1, i + 1)
