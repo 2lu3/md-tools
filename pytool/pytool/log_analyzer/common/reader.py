@@ -27,12 +27,9 @@ def read_log(log_paths: list[str]) -> pd.DataFrame:
 
                 elements = [x for x in line.split(" ") if x != ""]
 
-                df = df.append(
-                    pd.Series(
+                df = pd.concat([df, pd.Series(
                         [float(element) for element in elements[1:]], index=df.columns
-                    ),
-                    ignore_index=True,
-                )
+                    )], ignore_index=True)
 
     if "TIME" in df.columns:
         df["TIME"] = _normalize_time(df["TIME"])
