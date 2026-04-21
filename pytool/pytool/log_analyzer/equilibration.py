@@ -39,28 +39,28 @@ def analyze_equilibration(
     try:
         logger.info(f"Plotting Total Energy")
         plot_total_energy(df_list, condition_names, save_path_generator("total_energy"), window_size)
-    except ValueError as e:
+    except KeyError as e:
         logger.warning(f"Could not plot Total Energy: {e}")
         logger.debug(e)
 
     try:
         logger.info(f"Plotting Temperature")
         plot_temperature(df_list, condition_names, save_path_generator("temperature"), window_size)
-    except ValueError as e:
+    except KeyError as e:
         logger.warning(f"Could not plot Temperature: {e}")
         logger.debug(e)
 
     try:
         logger.info(f"Plotting Box Sizes")
         plot_box_sizes(df_list, condition_names, save_path_generator("box_sizes"))
-    except ValueError as e:
+    except KeyError as e:
         logger.warning(f"Could not plot Box Sizes: {e}")
         logger.debug(e)
 
     try:
         logger.info(f"Plotting Pressure")
         plot_pressure(df_list, condition_names, save_path_generator("pressure"), window_size)
-    except ValueError as e:
+    except KeyError as e:
         logger.warning(f"Could not plot Pressure: {e}")
         logger.debug(e)
 
