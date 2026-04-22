@@ -24,7 +24,8 @@ def plot_box_sizes(
 
             ax.plot(x, y, label=condition_names[i])
 
-        ax.legend()
+        ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
+        fig.tight_layout()
 
     fig.savefig(output_path)
 
@@ -42,11 +43,20 @@ def plot_pressure(
 
     for condition_name in condition_names:
         for df in df_list:
-            time = df["TIME"] if window_size is None else _apply_window_size(df["TIME"], window_size)
-            pressure = df["PRESSURE"] if window_size is None else _apply_window_size(df["PRESSURE"], window_size)
+            time = (
+                df["TIME"]
+                if window_size is None
+                else _apply_window_size(df["TIME"], window_size)
+            )
+            pressure = (
+                df["PRESSURE"]
+                if window_size is None
+                else _apply_window_size(df["PRESSURE"], window_size)
+            )
             ax.plot(time, pressure, label=condition_name)
 
-    ax.legend()
+    ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
+    fig.tight_layout()
     fig.savefig(output_path)
 
 
@@ -63,12 +73,22 @@ def plot_temperature(
 
     for condition_name in condition_names:
         for df in df_list:
-            time = df["TIME"] if window_size is None else _apply_window_size(df["TIME"], window_size)
-            temperature = df["TEMPERATURE"] if window_size is None else _apply_window_size(df["TEMPERATURE"], window_size)
+            time = (
+                df["TIME"]
+                if window_size is None
+                else _apply_window_size(df["TIME"], window_size)
+            )
+            temperature = (
+                df["TEMPERATURE"]
+                if window_size is None
+                else _apply_window_size(df["TEMPERATURE"], window_size)
+            )
             ax.plot(time, temperature, label=condition_name)
 
-    ax.legend()
+    ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
+    fig.tight_layout()
     fig.savefig(output_path)
+
 
 def plot_potential_energy(
     df_list: list[pd.DataFrame],
@@ -84,12 +104,22 @@ def plot_potential_energy(
 
     for condition_name in condition_names:
         for df in df_list:
-            time = df["TIME"] if window_size is None else _apply_window_size(df["TIME"], window_size)
-            potential_energy = df["POTENTIAL_ENE"] if window_size is None else _apply_window_size(df["POTENTIAL_ENE"], window_size)
+            time = (
+                df["TIME"]
+                if window_size is None
+                else _apply_window_size(df["TIME"], window_size)
+            )
+            potential_energy = (
+                df["POTENTIAL_ENE"]
+                if window_size is None
+                else _apply_window_size(df["POTENTIAL_ENE"], window_size)
+            )
             ax.plot(time, potential_energy, label=condition_name)
 
-    ax.legend()
+    ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
+    fig.tight_layout()
     fig.savefig(output_path)
+
 
 def plot_total_energy(
     df_list: list[pd.DataFrame],
@@ -104,11 +134,20 @@ def plot_total_energy(
 
     for condition_name in condition_names:
         for df in df_list:
-            total_energy = df["TOTAL_ENE"] if window_size is None else _apply_window_size(df["TOTAL_ENE"], window_size)
-            time = df["TIME"] if window_size is None else _apply_window_size(df["TIME"], window_size)
+            total_energy = (
+                df["TOTAL_ENE"]
+                if window_size is None
+                else _apply_window_size(df["TOTAL_ENE"], window_size)
+            )
+            time = (
+                df["TIME"]
+                if window_size is None
+                else _apply_window_size(df["TIME"], window_size)
+            )
             ax.plot(time, total_energy, label=condition_name)
 
-    ax.legend()
+    ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
+    fig.tight_layout()
     fig.savefig(output_path)
 
 
