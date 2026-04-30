@@ -18,11 +18,10 @@ def plot_box_sizes(
         ax.set_ylabel(f"Box size (Å)")
         ax.set_title(f"Box size {label}")
 
-        for df in df_list:
+        for condition_name, df in zip(condition_names, df_list):
             x = df["TIME"]
             y = df[column_name]
-
-            ax.plot(x, y, label=condition_names[i])
+            ax.plot(x, y, label=condition_name)
 
         ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
         fig.tight_layout()
@@ -41,19 +40,18 @@ def plot_pressure(
     ax.set_ylabel("Pressure (bar)")
     ax.set_title("Pressure")
 
-    for condition_name in condition_names:
-        for df in df_list:
-            time = (
-                df["TIME"]
-                if window_size is None
-                else _apply_window_size(df["TIME"], window_size)
-            )
-            pressure = (
-                df["PRESSURE"]
-                if window_size is None
-                else _apply_window_size(df["PRESSURE"], window_size)
-            )
-            ax.plot(time, pressure, label=condition_name)
+    for condition_name, df in zip(condition_names, df_list):
+        time = (
+            df["TIME"]
+            if window_size is None
+            else _apply_window_size(df["TIME"], window_size)
+        )
+        pressure = (
+            df["PRESSURE"]
+            if window_size is None
+            else _apply_window_size(df["PRESSURE"], window_size)
+        )
+        ax.plot(time, pressure, label=condition_name)
 
     ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
     fig.tight_layout()
@@ -71,19 +69,18 @@ def plot_temperature(
     ax.set_ylabel("Temperature (K)")
     ax.set_title("Temperature")
 
-    for condition_name in condition_names:
-        for df in df_list:
-            time = (
-                df["TIME"]
-                if window_size is None
-                else _apply_window_size(df["TIME"], window_size)
-            )
-            temperature = (
-                df["TEMPERATURE"]
-                if window_size is None
-                else _apply_window_size(df["TEMPERATURE"], window_size)
-            )
-            ax.plot(time, temperature, label=condition_name)
+    for condition_name, df in zip(condition_names, df_list):
+        time = (
+            df["TIME"]
+            if window_size is None
+            else _apply_window_size(df["TIME"], window_size)
+        )
+        temperature = (
+            df["TEMPERATURE"]
+            if window_size is None
+            else _apply_window_size(df["TEMPERATURE"], window_size)
+        )
+        ax.plot(time, temperature, label=condition_name)
 
     ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
     fig.tight_layout()
@@ -102,19 +99,18 @@ def plot_potential_energy(
     ax.set_ylabel("Potential Energy (kJ/mol)")
     ax.set_title("Potential Energy")
 
-    for condition_name in condition_names:
-        for df in df_list:
-            time = (
-                df["TIME"]
-                if window_size is None
-                else _apply_window_size(df["TIME"], window_size)
-            )
-            potential_energy = (
-                df["POTENTIAL_ENE"]
-                if window_size is None
-                else _apply_window_size(df["POTENTIAL_ENE"], window_size)
-            )
-            ax.plot(time, potential_energy, label=condition_name)
+    for condition_name, df in zip(condition_names, df_list):
+        time = (
+            df["TIME"]
+            if window_size is None
+            else _apply_window_size(df["TIME"], window_size)
+        )
+        potential_energy = (
+            df["POTENTIAL_ENE"]
+            if window_size is None
+            else _apply_window_size(df["POTENTIAL_ENE"], window_size)
+        )
+        ax.plot(time, potential_energy, label=condition_name)
 
     ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
     fig.tight_layout()
@@ -132,19 +128,18 @@ def plot_total_energy(
     ax.set_ylabel("Total Energy (kJ/mol)")
     ax.set_title("Total Energy")
 
-    for condition_name in condition_names:
-        for df in df_list:
-            total_energy = (
-                df["TOTAL_ENE"]
-                if window_size is None
-                else _apply_window_size(df["TOTAL_ENE"], window_size)
-            )
-            time = (
-                df["TIME"]
-                if window_size is None
-                else _apply_window_size(df["TIME"], window_size)
-            )
-            ax.plot(time, total_energy, label=condition_name)
+    for condition_name, df in zip(condition_names, df_list):
+        total_energy = (
+            df["TOTAL_ENE"]
+            if window_size is None
+            else _apply_window_size(df["TOTAL_ENE"], window_size)
+        )
+        time = (
+            df["TIME"]
+            if window_size is None
+            else _apply_window_size(df["TIME"], window_size)
+        )
+        ax.plot(time, total_energy, label=condition_name)
 
     ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
     fig.tight_layout()
