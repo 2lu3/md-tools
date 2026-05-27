@@ -144,6 +144,7 @@ class StepManager:
         non_ignore_files: Sequence[str] = ("*.dvc", ".gitignore"),
     ) -> None:
         current_step = self._layout.current_step()
+        shutil.rmtree(current_step.data_dir, ignore_errors=True)
         current_step.data_dir.mkdir(parents=True)
 
         for subdir in subdirs:
