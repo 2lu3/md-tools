@@ -56,7 +56,7 @@ class Step:
 
     @property
     def global_template_dir(self) -> Path:
-        return self._project_root / "template"
+        return self._project_root / "src" / "template"
 
 class ProjectLayout:
     """プロジェクトルート・パッケージ名・step ディレクトリの探索と current / previous の解決。
@@ -84,6 +84,10 @@ class ProjectLayout:
 
     def get_step_by_index(self, index: int) -> Step:
         return self.steps[index]
+
+    @property
+    def global_template_dir(self) -> Path:
+        return self.project_root / "src" / "template"
 
     def _find_package_name(self) -> str:
         # pyproject.toml の [project] セクションの name を取得
