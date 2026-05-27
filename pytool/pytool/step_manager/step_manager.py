@@ -5,17 +5,18 @@ step manager
 
 01, 02, 03, ... は step の番号。2桁とは限らない
 (project_root)/
-├── src/
-│   ├── (package name)/
-│   │   ├── 01_(step name)/
-│   │   ├── 02_(step name)/
-│   │   ├── 03_(step name)/
-│   │   └── ...
 ├── data/
 │   ├── 01_(step name)/
 │   ├── 02_(step name)/
 │   ├── 03_(step name)/
 │   └── ...
+├── src/
+│   ├── (package name)/
+│   │   ├── 01_(step name)/
+│   │   │   ├── template/
+│   │   ├── 02_(step name)/
+│   │   ├── 03_(step name)/
+│   │   └── ...
 ├── template/
 ├── pyproject.toml
 """
@@ -51,6 +52,10 @@ class Step:
 
     @property
     def template_dir(self) -> Path:
+        return self.src_dir / "template"
+
+    @property
+    def global_template_dir(self) -> Path:
         return self._project_root / "template"
 
 class ProjectLayout:
