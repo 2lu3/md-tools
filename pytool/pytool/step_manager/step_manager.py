@@ -56,7 +56,7 @@ class Step:
 
     @property
     def global_template_dir(self) -> Path:
-        return self._project_root / "src" / "template"
+        return self._project_root / "src" / self._package_name / "template"
 
 class ProjectLayout:
     """プロジェクトルート・パッケージ名・step ディレクトリの探索と current / previous の解決。
