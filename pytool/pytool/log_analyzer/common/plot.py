@@ -1,3 +1,4 @@
+"""Plot common log analysis figures."""
 
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -6,6 +7,13 @@ from matplotlib import pyplot as plt
 def plot_box_sizes(
     df_list: list[pd.DataFrame], condition_names: list[str], output_path: str
 ) -> None:
+    """Plot box size values for multiple conditions.
+
+    Args:
+        df_list: Data frames containing box size columns.
+        condition_names: Labels for each condition.
+        output_path: Path where the figure is saved.
+    """
     fig = plt.figure()
 
     for i, (label, column_name) in enumerate(
@@ -33,6 +41,14 @@ def plot_pressure(
     output_path: str,
     window_size: int | None = None,
 ) -> None:
+    """Plot pressure values for multiple conditions.
+
+    Args:
+        df_list: Data frames containing pressure values.
+        condition_names: Labels for each condition.
+        output_path: Path where the figure is saved.
+        window_size: Optional moving average window size.
+    """
     fig, ax = plt.subplots()
     ax.set_xlabel("Time (ps)")
     ax.set_ylabel("Pressure (bar)")
@@ -62,6 +78,14 @@ def plot_temperature(
     output_path: str,
     window_size: int | None = None,
 ) -> None:
+    """Plot temperature values for multiple conditions.
+
+    Args:
+        df_list: Data frames containing temperature values.
+        condition_names: Labels for each condition.
+        output_path: Path where the figure is saved.
+        window_size: Optional moving average window size.
+    """
     fig, ax = plt.subplots()
     ax.set_xlabel("Time (ps)")
     ax.set_ylabel("Temperature (K)")
@@ -91,7 +115,14 @@ def plot_potential_energy(
     output_path: str,
     window_size: int | None = None,
 ) -> None:
+    """Plot potential energy values for multiple conditions.
 
+    Args:
+        df_list: Data frames containing potential energy values.
+        condition_names: Labels for each condition.
+        output_path: Path where the figure is saved.
+        window_size: Optional moving average window size.
+    """
     fig, ax = plt.subplots()
     ax.set_xlabel("Time (ps)")
     ax.set_ylabel("Potential Energy (kJ/mol)")
@@ -121,6 +152,14 @@ def plot_total_energy(
     output_path: str,
     window_size: int | None = None,
 ) -> None:
+    """Plot total energy values for multiple conditions.
+
+    Args:
+        df_list: Data frames containing total energy values.
+        condition_names: Labels for each condition.
+        output_path: Path where the figure is saved.
+        window_size: Optional moving average window size.
+    """
     fig, ax = plt.subplots()
     ax.set_xlabel("Time (ps)")
     ax.set_ylabel("Total Energy (kJ/mol)")
@@ -144,8 +183,8 @@ def plot_total_energy(
     fig.savefig(output_path)
 
 
-def _apply_window_size(x: list[float], window_size: int):
-    result: list[float] = []
-    for i in range(len(x) - window_size):
-        result.append(sum(x[i : i + window_size]) / window_size)
-    return result
+def _apply_window_size(x: list[float], window_size: int) -> list[float]:
+    return [
+        sum(x[i : i + window_size]) / window_size
+        for i in range(len(x) - window_size)
+    ]

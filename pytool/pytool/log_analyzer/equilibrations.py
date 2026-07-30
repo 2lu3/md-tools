@@ -1,8 +1,9 @@
-import os
+"""Analyze equilibration runs across multiple projects."""
+
 from argparse import ArgumentParser
 from dataclasses import dataclass
-from glob import glob
 from itertools import cycle
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,14 +17,29 @@ from .common.reader import read_log
 
 linestyles = ["-", "--", "-.", ":"]
 
-def analyze_box_sizes(
+
+def analyze_box_sizes(  # noqa: C901, PLR0912
     project_dirs: list[str],
+    *,
     use_moving_average: bool = False,
     window_size: int = 10,
     figsize: tuple[int, int] = (12, 6),
-):
+) -> Figure:
+    """Plot box size values across multiple projects.
+
+    Args:
+        project_dirs: Project directories or log files to analyze.
+        use_moving_average: Whether to plot a moving average.
+        window_size: Moving average window size.
+        figsize: Figure size in inches.
+
+    Returns:
+        Box size comparison figure.
+    """
     @dataclass
     class Data:
+        """Box size data grouped by project and log file."""
+
         project_name: str
         time: dict[str, list[int]]
         x: dict[str, list[float]]
@@ -33,7 +49,7 @@ def analyze_box_sizes(
     data_list: list[Data] = []
     for project_dir in project_dirs:
         data = Data(
-            project_name=os.path.basename(os.path.normpath(project_dir)),
+            project_name=Path(project_dir).name,
             time={},
             x={},
             y={},
@@ -45,7 +61,7 @@ def analyze_box_sizes(
             if "BOXX" not in df.columns:
                 continue
 
-            log_name = os.path.basename(os.path.normpath(log_file))
+            log_name = Path(log_file).name
             time = list(map(int, df["TIME"]))
             x = list(map(float, df["BOXX"]))
             y = list(map(float, df["BOXY"]))
@@ -73,7 +89,17 @@ def analyze_box_sizes(
             ax = fig.add_subplot(3, len(file_names), index)
             index += 1
             cmap = cm.get_cmap("tab20c")
-            ax.set_prop_cycle(color=[cmap(i) for i in np.linspace(0, 1, len(data_list) // len(linestyles) + 1) for _ in range(len(linestyles)) ])
+            ax.set_prop_cycle(
+                color=[
+                    cmap(color_index)
+                    for color_index in np.linspace(
+                        0,
+                        1,
+                        len(data_list) // len(linestyles) + 1,
+                    )
+                    for _ in range(len(linestyles))
+                ]
+            )
             linestyle_cycler = cycle(linestyles)
 
             ax.set_title(f"{file_name} {dim}")
@@ -127,74 +153,72 @@ def analyze_box_sizes(
 
 def analyze_equilibrations(
     project_dirs: list[str],
+    *,
     use_moving_average: bool = False,
     window_size: int = 10,
     figsize: tuple[int, int] = (12, 6),
 ) -> list[tuple[str, Figure]]:
-    """analyze_equilibrations.
+    """Plot equilibration values across multiple projects.
 
-    以下のグラフを作成する
-    * 全エネルギー
-    * ポテンシャルエネルギー
-    * 運動エネルギー
-    * 温度
-    * 格子サイズ
-    * 圧力
-
+    Creates total energy, potential energy, kinetic energy, temperature,
+    box size, and pressure figures.
 
     Args:
-        project_dirs (list[str]): project_dirs
-        use_moving_average (bool): use_moving_average
-        window_size (int): window_size
-        figsize (tuple[int, int]): figsize
+        project_dirs: Project directories or log files to analyze.
+        use_moving_average: Whether to plot a moving average.
+        window_size: Moving average window size.
+        figsize: Figure size in inches.
 
     Returns:
-        Figure:
+        Named equilibration comparison figures.
     """
     fig_total_energy = fig_by_column(
         project_dirs,
         "TOTAL_ENE",
         "Total Energy (KJ/mol)",
-        use_moving_average,
-        window_size,
-        figsize,
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
     )
     fig_potential_energy = fig_by_column(
         project_dirs,
         "POTENTIAL_ENE",
         "Potential Energy (KJ/mol)",
-        use_moving_average,
-        window_size,
-        figsize,
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
     )
     fig_kinetic_energy = fig_by_column(
         project_dirs,
         "KINETIC_ENE",
         "Kinetic Energy (KJ/mol)",
-        use_moving_average,
-        window_size,
-        figsize,
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
     )
     fig_temperature = fig_by_column(
         project_dirs,
         "TEMPERATURE",
         "Temperature (K)",
-        use_moving_average,
-        window_size,
-        figsize,
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
     )
 
     fig_box_sizes = analyze_box_sizes(
-        project_dirs, use_moving_average, window_size, figsize
+        project_dirs,
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
     )
 
     fig_pressure = fig_by_column(
         project_dirs,
         "PRESSURE",
         "Pressure (bar)",
-        use_moving_average,
-        window_size,
-        figsize,
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
     )
 
     return [
@@ -208,6 +232,7 @@ def analyze_equilibrations(
 
 
 def command() -> None:
+    """Run multi-project equilibration analysis from the command line."""
     parser = ArgumentParser()
     parser.add_argument("--project_dirs", nargs="+", type=str, default=None)
     parser.add_argument("--root-dir", type=str, default=None)
@@ -217,18 +242,20 @@ def command() -> None:
     parser.add_argument("--use-moving-average", action="store_true")
     args = parser.parse_args()
 
-    assert args.project_dirs is not None or args.root_dir is not None
+    if args.project_dirs is None and args.root_dir is None:
+        msg = "Either project_dirs or root_dir must be provided"
+        raise ValueError(msg)
 
     if args.project_dirs is None:
-        dirs = glob(os.path.join(args.root_dir, "*/"))
+        dirs = [str(project_dir) for project_dir in Path(args.root_dir).glob("*/")]
     else:
         dirs = args.project_dirs
 
     figs = analyze_equilibrations(
         dirs,
-        args.use_moving_average,
-        args.window_size,
-        args.figsize,
+        use_moving_average=args.use_moving_average,
+        window_size=args.window_size,
+        figsize=args.figsize,
     )
     for name, fig in figs:
         fig.savefig(f"{args.out_name}_{name}.png")

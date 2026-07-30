@@ -1,6 +1,8 @@
-import os
+"""Build comparison figures for a selected log column."""
+
 from dataclasses import dataclass, field
 from itertools import cycle
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,14 +17,25 @@ linestyles = ["-", "--", "-.", ":"]
 
 @dataclass
 class Data:
+   """Log data grouped by project and file."""
+
    project_name: str
    time: dict[str, list[int]] = field(default_factory=dict)
    value: dict[str, list[float]] = field(default_factory=dict)
 
 
 def read_column(project_dir: str, column_name: str) -> Data:
+    """Read a selected column from all logs in a project.
+
+    Args:
+        project_dir: Directory or log file path to read.
+        column_name: Column name to extract.
+
+    Returns:
+        Project data keyed by log file name.
+    """
     data: Data = Data(
-        project_name=os.path.basename(os.path.normpath(project_dir)),
+        project_name=Path(project_dir).name,
         time={},
         value={},
     )
@@ -30,7 +43,7 @@ def read_column(project_dir: str, column_name: str) -> Data:
         df = read_log([log_file])
         if column_name not in df.columns:
             continue
-        log_name = os.path.basename(os.path.normpath(log_file))
+        log_name = Path(log_file).name
         time = list(map(int, df["TIME"]))
         value = list(map(float, df[column_name]))
 
@@ -39,18 +52,42 @@ def read_column(project_dir: str, column_name: str) -> Data:
     return data
 
 def read_projects_log(project_dirs: list[str], column_name: str) -> list[Data]:
-    data_list: list[Data] = [read_column(project_dir, column_name) for project_dir in project_dirs]
+    """Read a selected column from multiple projects.
+
+    Args:
+        project_dirs: Project directories or log files to read.
+        column_name: Column name to extract.
+
+    Returns:
+        Naturally sorted project data.
+    """
+    data_list: list[Data] = [
+        read_column(project_dir, column_name) for project_dir in project_dirs
+    ]
     return natsorted(data_list, key=lambda x: x.project_name)
 
-def fig_by_column(
+def fig_by_column(  # noqa: PLR0913
         project_dirs: list[str],
         column_name: str,
         display_name: str,
+        *,
         use_moving_average: bool,
         window_size: int,
         figsize: tuple[int, int],
         )-> Figure:
+    """Create a figure comparing one log column across projects.
 
+    Args:
+        project_dirs: Project directories or log files to read.
+        column_name: Column name to plot.
+        display_name: Figure title.
+        use_moving_average: Whether to plot a moving average.
+        window_size: Moving average window size.
+        figsize: Figure size in inches.
+
+    Returns:
+        Comparison figure.
+    """
     data_list = read_projects_log(project_dirs, column_name)
 
 
@@ -64,7 +101,17 @@ def fig_by_column(
     for i, file_name in enumerate(file_names):
         ax = fig.add_subplot(1, len(file_names), i + 1)
         cmap = cm.get_cmap("tab20c")
-        ax.set_prop_cycle(color=[cmap(i) for i in np.linspace(0, 1, len(data_list) // len(linestyles) + 1) for _ in range(len(linestyles)) ])
+        ax.set_prop_cycle(
+            color=[
+                cmap(color_index)
+                for color_index in np.linspace(
+                    0,
+                    1,
+                    len(data_list) // len(linestyles) + 1,
+                )
+                for _ in range(len(linestyles))
+            ]
+        )
         linestyle_cycler = cycle(linestyles)
 
         for data in data_list:
