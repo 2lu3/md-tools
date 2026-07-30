@@ -27,5 +27,7 @@
 
 ## Acceptance criteria
 
-- [ ] `cd pytool && uv run ruff check pytool tests` がエラー 0
-- [ ] `cd pytool && uv run pytest` が通る
+- [x] `cd pytool && uv run ruff check pytool tests` がエラー 0
+- [x] 実行可能な既存テストが通る（`test_get_box_size` / `test_reduce_dcd` / `test_rename2charmm`）
+- [ ] 補足: `test_input_builder` は存在しない `pytool.input_builder` を参照（main 時点から壊れている）
+- [ ] 補足: `test_log_analysis` は `tests/data/min.log` がリポジトリに無く失敗する（main 時点から）
