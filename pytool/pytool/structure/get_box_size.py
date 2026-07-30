@@ -1,4 +1,6 @@
 
+"""Calculate molecular structure box sizes."""
+
 import click
 import MDAnalysis as mda
 
@@ -12,7 +14,8 @@ def get_box_size(u: mda.Universe | str) -> tuple[float, float, float]:
     Returns:
         tuple[float, float, float]: Box size in x, y, z
     """
-    def get_box_size_from_atoms(atoms: mda.AtomGroup):
+
+    def get_box_size_from_atoms(atoms: mda.AtomGroup) -> tuple[float, float, float]:
         """Get box size from atoms.
 
         Args:
@@ -33,16 +36,16 @@ def get_box_size(u: mda.Universe | str) -> tuple[float, float, float]:
     if isinstance(u, str):
         u = mda.Universe(u)
 
-    assert u.atoms is not None, "No atoms found in the first DCD file"
+    if u.atoms is None:
+        msg = "No atoms found in the first DCD file."
+        raise ValueError(msg)
     return get_box_size_from_atoms(u.atoms)
+
 
 @click.command()
 @click.argument("input_pdb", type=click.Path(exists=True))
 def get_box_size_to_command(input_pdb: str) -> None:
+    """Run the get-boxsize command."""
     u = mda.Universe(input_pdb)
 
     get_box_size(u)
-
-
-
-

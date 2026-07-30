@@ -1,3 +1,5 @@
+"""Sample average structures from trajectories."""
+
 import warnings
 
 import click
@@ -7,24 +9,46 @@ from MDAnalysis.analysis import align
 
 warnings.filterwarnings("ignore")
 
+MIN_MULTI_SAMPLE_OUTPUTS = 2
 
-def _save_frame(average_structure: align.AverageStructure, start_frame: int, end_frame: int, output_name) -> None:
-    # Use the AverageStructure class to compute the average
+
+def _save_frame(
+    average_structure: align.AverageStructure,
+    start_frame: int,
+    end_frame: int,
+    output_name: str,
+) -> None:
     av = average_structure.run(
-        start=start_frame, stop=end_frame, step=1
+        start=start_frame,
+        stop=end_frame,
+        step=1,
     )
 
-    assert av.universe.atoms is not None
-    # Save the average structure
-    with mda.Writer(output_name, av.universe.atoms.n_atoms) as W:
-        W.write(av.results.universe.atoms)
+    if av.universe.atoms is None:
+        msg = "No atoms found in average structure."
+        raise ValueError(msg)
+    with mda.Writer(output_name, av.universe.atoms.n_atoms) as writer:
+        writer.write(av.results.universe.atoms)
 
     logger.info(f"Saved frame {start_frame}-{end_frame} -> {output_name}")
 
 
 def sample_trajectory(
-        dcd_path: str, pdb_path: str, output_name: str ="structure", output_num: int=3, window_size: int=10
+    dcd_path: str,
+    pdb_path: str,
+    output_name: str = "structure",
+    output_num: int = 3,
+    window_size: int = 10,
 ) -> None:
+    """Sample average structures from a trajectory.
+
+    Args:
+        dcd_path: Input DCD trajectory path.
+        pdb_path: PDB topology file path.
+        output_name: Output file prefix.
+        output_num: Number of output structures.
+        window_size: Number of frames to average per output.
+    """
     u = mda.Universe(pdb_path, dcd_path)
     average_structure = align.AverageStructure(u, reference=u, ref_frame=0)
     trajectory_num = len(u.trajectory)
@@ -37,7 +61,7 @@ def sample_trajectory(
             output_name + ".pdb",
         )
         return
-    if output_num == 2:
+    if output_num == MIN_MULTI_SAMPLE_OUTPUTS:
         _save_frame(
             average_structure,
             0,
@@ -82,4 +106,5 @@ def sample_trajectory(
 def command(
     pdb_path: str, dcd_path: str, output: str, output_num: int, average_num: int
 ) -> None:
+    """Run the sample-trajectory command."""
     sample_trajectory(dcd_path, pdb_path, output, output_num, average_num)

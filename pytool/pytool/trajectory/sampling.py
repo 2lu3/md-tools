@@ -1,9 +1,18 @@
+"""Reduce DCD trajectory frame counts."""
+
 import argparse
 
 from MDAnalysis.lib.formats.libdcd import DCDFile
 
 
 def reduce_dcd(input_path: str, stride: int, out_path: str) -> None:
+    """Write every stride-th frame from a DCD file.
+
+    Args:
+        input_path: Input DCD file path.
+        stride: Frame stride.
+        out_path: Output DCD file path.
+    """
     with DCDFile(input_path) as dcd, DCDFile(
         out_path,
         "w",
@@ -23,6 +32,7 @@ def reduce_dcd(input_path: str, stride: int, out_path: str) -> None:
 
 
 def reduce_dcd_to_command() -> None:
+    """Run the reduce-dcd command."""
     parser = argparse.ArgumentParser(
         description="Reduce the number of frames in a DCD file"
     )

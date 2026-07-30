@@ -1,6 +1,7 @@
-import os
+"""Concatenate DCD trajectory files."""
+
 import warnings
-from glob import glob
+from pathlib import Path
 
 import MDAnalysis as mda
 from loguru import logger
@@ -9,31 +10,39 @@ from natsort import natsorted
 warnings.filterwarnings("ignore")
 
 
-def _glob_dcd(dcds: list[str]):
+def _glob_dcd(dcds: list[str]) -> list[str]:
     """Glob DCD files from a list of dirs and files.
 
     Args:
-        dcds (list[str]): A list of dirs and files
+        dcds (list[str]): A list of dirs and files.
 
     Returns:
-        list[str]: A list of DCD files
+        list[str]: A list of DCD files.
 
     Examples:
         >>> glob_dcd(["/path/to/dir1", "/path/to/dir2", "/path/to/file.dcd"])
-        ["/path/to/dir1/1.dcd", "/path/to/dir1/2.dcd", "/path/to/dir2/1.dcd", "/path/to/dir2/2.dcd", "/path/to/file.dcd"]
+        [
+            "/path/to/dir1/1.dcd",
+            "/path/to/dir1/2.dcd",
+            "/path/to/dir2/1.dcd",
+            "/path/to/dir2/2.dcd",
+            "/path/to/file.dcd",
+        ]
     """
     result: list[str] = []
     for dcd_path in dcds:
-        if os.path.isdir(dcd_path):
-            dcd_files = glob(os.path.join(dcd_path, "**", "*.dcd"), recursive=True)
+        path = Path(dcd_path)
+        if path.is_dir():
+            dcd_files = natsorted(str(file_path) for file_path in path.rglob("*.dcd"))
             result.extend(natsorted(dcd_files))
             logger.debug(f"Found {len(dcd_files)} DCD files in {dcd_path}")
-        elif os.path.isfile(dcd_path):
+        elif path.is_file():
             result.append(dcd_path)
             logger.debug(f"Found {dcd_path}")
         else:
             logger.warning(f"Cannot find dir/file {dcd_path}")
     return result
+
 
 def concat_dcd(
     topology: str,
@@ -57,9 +66,11 @@ def concat_dcd(
 
     u = mda.Universe(topology)
 
-    assert u.atoms is not None, "No atoms found in the first DCD file"
-    with mda.Writer(output_name, u.atoms.n_atoms) as W:
+    if u.atoms is None:
+        msg = "No atoms found in the first DCD file."
+        raise ValueError(msg)
+    with mda.Writer(output_name, u.atoms.n_atoms) as writer:
         for dcd_path in dcd_paths:
             u.load_new(dcd_path)
             for _ in u.trajectory:
-                W.write(u.atoms)
+                writer.write(u.atoms)

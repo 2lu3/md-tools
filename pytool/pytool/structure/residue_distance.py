@@ -1,3 +1,5 @@
+"""Calculate distances between residues."""
+
 import warnings
 
 import click
@@ -10,6 +12,14 @@ warnings.filterwarnings("ignore")
 def residue_distance(
     topology: str, residue1: int, residue2: int, dcd: str | None = None
 ) -> None:
+    """Calculate CA-atom distances between two residues.
+
+    Args:
+        topology: Topology file path.
+        residue1: First residue ID.
+        residue2: Second residue ID.
+        dcd: Optional trajectory file path.
+    """
     u = mda.Universe(topology) if dcd is None else mda.Universe(topology, dcd)
 
     res1 = u.select_atoms(f"name CA and resid {residue1}")
@@ -30,4 +40,5 @@ def residue_distance(
 def residue_distance_to_command(
     topology: str, residue1: int, residue2: int, dcd: str | None
 ) -> None:
+    """Run the residue-distance command."""
     residue_distance(topology, residue1, residue2, dcd)

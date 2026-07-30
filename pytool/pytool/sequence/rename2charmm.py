@@ -1,13 +1,17 @@
+"""Rename PDB atoms and residues to CHARMM conventions."""
+
 import click
 import MDAnalysis as mda
 
 
-def rename2charmm(u: mda.Universe):
+def rename2charmm(u: mda.Universe) -> mda.Universe:
     """Rename atoms in a universe to CHARMM naming convention.
 
     Args:
-        u (mda.Universe): A universe
+        u: A universe.
 
+    Returns:
+        The renamed universe.
 
     Rename "PDB general atom name" to "CHARMM-specific atom name"
         HIS => HSD
