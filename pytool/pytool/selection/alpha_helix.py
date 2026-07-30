@@ -1,3 +1,5 @@
+"""Alpha-helix residue selection helpers."""
+
 import warnings
 
 import MDAnalysis as mda
@@ -5,7 +7,7 @@ from MDAnalysis.analysis.dssp import DSSP, translate
 
 warnings.filterwarnings("ignore")
 
-def _persistent_ss(u: mda.Universe, threshold):
+def _persistent_ss(u: mda.Universe, threshold: float) -> str:
     dssp = DSSP(u)
     long_run = dssp.run()
     persistent_residues = translate(
@@ -15,14 +17,14 @@ def _persistent_ss(u: mda.Universe, threshold):
 
 
 
-def _ss(u: mda.Universe):
+def _ss(u: mda.Universe) -> str:
     dssp = DSSP(u)
     long_run = dssp.run()
     return long_run.results.dssp[0]
 
 
 
-def _merge_ss(ss_list: list[str], method: str):
+def _merge_ss(ss_list: list[str], method: str) -> str:
     if not ss_list:
         msg = "ss_list must not be empty"
         raise ValueError(msg)
@@ -53,7 +55,21 @@ def _merge_ss(ss_list: list[str], method: str):
     return merged_ss
 
 
-def select_alpha_helix(u_list: list[mda.Universe], method: str,threshold: float = 0.8) -> str:
+def select_alpha_helix(
+    u_list: list[mda.Universe],
+    method: str,
+    threshold: float = 0.8,
+) -> str:
+    """Select residues that are persistently assigned as alpha helices.
+
+    Args:
+        u_list: Universes to inspect.
+        method: Merge method for secondary-structure calls.
+        threshold: DSSP occupancy threshold for persistent assignment.
+
+    Returns:
+        MDAnalysis selection string for alpha-helix residues.
+    """
     if not u_list:
         msg = "u_list must not be empty"
         raise ValueError(msg)
@@ -71,12 +87,10 @@ def select_alpha_helix(u_list: list[mda.Universe], method: str,threshold: float 
     alpha_helix_residues = []
     u = u_list[0]
     # DSSP assigns states to protein residues, so align against protein-only order.
-    protein_residues = u.select_atoms("protein").residues  # type: ignore
+    protein_residues = u.select_atoms("protein").residues  # type: ignore[attr-defined]
     if len(protein_residues) != len(merged_ss):
         msg = "DSSP residue count does not match protein residues in the universe"
-        raise ValueError(
-            msg
-        )
+        raise ValueError(msg)
 
     for res, ss in zip(protein_residues, merged_ss, strict=False):
         if ss == "H":

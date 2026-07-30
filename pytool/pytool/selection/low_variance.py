@@ -1,19 +1,38 @@
+"""Low-variance residue selection helpers."""
+
 import warnings
 
 import MDAnalysis as mda
 import numpy as np
 from loguru import logger
+from numpy.typing import NDArray
 
 warnings.filterwarnings("ignore")
 
+FloatArray = NDArray[np.float64]
+IntArray = NDArray[np.int64]
+BoolArray = NDArray[np.bool_]
 
-def load_position_resid(u_list: list[mda.Universe], selection: str | list[str]):
+
+def load_position_resid(
+    u_list: list[mda.Universe],
+    selection: str | list[str],
+) -> tuple[FloatArray, list[IntArray]]:
+    """Load selected atom positions and residue IDs from universes.
+
+    Args:
+        u_list: Universes to read.
+        selection: Atom selection string or per-universe selection strings.
+
+    Returns:
+        Tuple of positions and residue ID arrays.
+    """
     logger.debug("Loading positions")
 
     selections = [selection] * len(u_list) if isinstance(selection, str) else selection
 
-    positions = []
-    resids = []
+    positions: list[FloatArray] = []
+    resids: list[IntArray] = []
     for u, sel in zip(u_list, selections, strict=False):
         for _ in u.trajectory:
             atoms = u.select_atoms(sel)
@@ -24,87 +43,86 @@ def load_position_resid(u_list: list[mda.Universe], selection: str | list[str]):
     return positions, resids
 
 
-def kabsch(P, Q):
-    """Kabsch アルゴリズムを用いて、点群 P を Q に最適に重ね合わせる回転 R と並進 t を計算する。
-    P, Q: (N, 3) の numpy 配列
+def kabsch(P: FloatArray, Q: FloatArray) -> tuple[FloatArray, FloatArray]:  # noqa: N803
+    """Compute the optimal rotation and translation from P onto Q.
+
+    Args:
+        P: Moving point cloud with shape (N, 3).
+        Q: Reference point cloud with shape (N, 3).
+
     Returns:
-        R: 回転行列 (3, 3)
-        t: 並進ベクトル (3,).
+        Rotation matrix and translation vector.
     """
-    # 各点群の重心を計算
-    centroid_P = np.mean(P, axis=0)
-    centroid_Q = np.mean(Q, axis=0)
-    # 中心化
-    P_centered = P - centroid_P
-    Q_centered = Q - centroid_Q
-    # 共分散行列の計算
-    H = np.dot(P_centered.T, Q_centered)
-    # SVD 分解
-    U, _S, Vt = np.linalg.svd(H)
-    V = Vt.T
-    # 回転行列 R = V * U^T（鏡像反転を防ぐための調整）
-    d = np.linalg.det(np.dot(V, U.T))
-    D = np.eye(3)
-    D[2, 2] = d
-    R = np.dot(V, np.dot(D, U.T))
-    # 並進ベクトル
-    t = centroid_Q - np.dot(centroid_P, R)
-    return R, t
+    centroid_p = np.mean(P, axis=0)
+    centroid_q = np.mean(Q, axis=0)
+    p_centered = P - centroid_p
+    q_centered = Q - centroid_q
+    covariance = np.dot(p_centered.T, q_centered)
+    u_matrix, _singular_values, vt_matrix = np.linalg.svd(covariance)
+    v_matrix = vt_matrix.T
+    determinant = np.linalg.det(np.dot(v_matrix, u_matrix.T))
+    correction = np.eye(3)
+    correction[2, 2] = determinant
+    rotation = np.dot(v_matrix, np.dot(correction, u_matrix.T))
+    translation = centroid_q - np.dot(centroid_p, rotation)
+    return rotation, translation
 
 
-def align_positions(positions):
-    """全フレームの座標を、平均値に対してアライメントする。
-    positions: shape (n_frames, n_residues, 3).
+def align_positions(positions: FloatArray) -> FloatArray:
+    """Align all coordinate frames to the mean structure.
+
+    Args:
+        positions: Coordinates with shape (n_frames, n_residues, 3).
 
     Returns:
-        aligned_positions: 同じ shape のアライメント後の座標
+        Aligned coordinates with the same shape.
     """
     n_frames = positions.shape[0]
     aligned_positions = np.empty_like(positions)
     ref = np.mean(positions, axis=0)
 
     for i in range(n_frames):
-        P = positions[i]
-        # Kabsch により P を ref に重ね合わせる変換を求める
-        R, t = kabsch(P, ref)
-        aligned_positions[i] = np.dot(P, R) + t
+        frame_positions = positions[i]
+        rotation, translation = kabsch(frame_positions, ref)
+        aligned_positions[i] = np.dot(frame_positions, rotation) + translation
     return aligned_positions
 
 
-def compute_rmsf(aligned_positions):
-    """各残基ごとの RMSF (Root Mean Square Fluctuation) を計算する。
-    aligned_positions: shape (n_frames, n_residues, 3).
+def compute_rmsf(aligned_positions: FloatArray) -> FloatArray:
+    """Compute per-residue RMSF values.
+
+    Args:
+        aligned_positions: Coordinates with shape (n_frames, n_residues, 3).
 
     Returns:
-        rmsf: (n_residues,) 各残基の RMSF 値（Å単位）
+        RMSF values with shape (n_residues,).
     """
-    # 各残基の平均位置（フレーム平均）
-    mean_positions = np.mean(aligned_positions, axis=0)  # shape: (n_residues, 3)
-    # 各フレームごとの差分
-    diffs = aligned_positions - mean_positions  # shape: (n_frames, n_residues, 3)
-    # 各点での二乗和
-    squared_diffs = np.sum(diffs**2, axis=2)  # shape: (n_frames, n_residues)
-    # フレームごとの平均二乗偏差 → ルートを取る
-    return np.sqrt(np.mean(squared_diffs, axis=0))  # shape: (n_residues,)
+    mean_positions = np.mean(aligned_positions, axis=0)
+    diffs = aligned_positions - mean_positions
+    squared_diffs = np.sum(diffs**2, axis=2)
+    return np.sqrt(np.mean(squared_diffs, axis=0))
 
 
 
-def calc_low_variance(positions: np.ndarray) -> tuple[list[float], list[np.ndarray]]:
-    candidate_mask_list: list[np.ndarray] = []
+def calc_low_variance(positions: FloatArray) -> tuple[list[float], list[BoolArray]]:
+    """Calculate low-variance candidate masks by iterative RMSF pruning.
+
+    Args:
+        positions: Coordinates with shape (n_frames, n_residues, 3).
+
+    Returns:
+        Average RMSF values and candidate masks for each pruning step.
+    """
+    candidate_mask_list: list[BoolArray] = []
     avg_rmsf_list: list[float] = []
 
-    # 候補残基のマスク（初期はすべて True）
     candidate_mask = np.ones(positions.shape[1], dtype=bool)
-    # 候補残基が1個以上残るまで反復
     while candidate_mask.sum() > 0:
-        # 現在の候補残基に対応する座標を抽出
         positions_sel = positions[
             :, candidate_mask, :
-        ]  # shape: (n_frames, candidate_ount, 3)
-        # アライメント：ここでは最初のフレームを参照している（必要に応じて平均構造参照への変更も可能）
+        ]
         aligned_sel = align_positions(positions_sel)
-        # 各候補残基ごとに RMSF を計算
-        rmsf_sel = compute_rmsf(aligned_sel)  # shape: (candidate_count,)
+        rmsf_sel = compute_rmsf(aligned_sel)
         avg_rmsf = np.mean(rmsf_sel)
 
         current_candidate_count = candidate_mask.sum()
@@ -116,7 +134,6 @@ def calc_low_variance(positions: np.ndarray) -> tuple[list[float], list[np.ndarr
         candidate_mask_list.append(candidate_mask.copy())
         avg_rmsf_list.append(avg_rmsf)
 
-        # 毎回、RMSF が最も高い残基を除去
         idx_to_remove = np.argmax(rmsf_sel)
         candidate_indices = np.where(candidate_mask)[0]
         remove_index = candidate_indices[idx_to_remove]
@@ -127,13 +144,21 @@ def calc_low_variance(positions: np.ndarray) -> tuple[list[float], list[np.ndarr
 
 def calc_low_variance_residues(
     u_list: list[mda.Universe], selection: str | list[str] = "protein and name CA"
-):
-    positions: np.ndarray
-    resids: list
+) -> list[tuple[float, list[str]]]:
+    """Calculate low-variance residue IDs for each pruning step.
+
+    Args:
+        u_list: Universes to analyze.
+        selection: Atom selection string or per-universe selection strings.
+
+    Returns:
+        Average RMSF values paired with remaining residue IDs.
+    """
     positions, resids = load_position_resid(u_list, selection)
 
-    # len(resids[i]) should be same for all i
-    assert len(set(map(len, resids))) == 1, "All residues should have same length"
+    if len({len(resid) for resid in resids}) != 1:
+        msg = "All residues should have same length"
+        raise ValueError(msg)
 
     avg_rmsfs, candidate_masks = calc_low_variance(positions)
 
@@ -149,7 +174,17 @@ def select_low_variance_residues(
     u_list: list[mda.Universe],
     remain_res_num: int,
     selection: str | list[str] = "protein and name CA",
-):
+) -> str:
+    """Select the requested count of lowest-variance residues.
+
+    Args:
+        u_list: Universes to analyze.
+        remain_res_num: Number of residues to keep.
+        selection: Atom selection string or per-universe selection strings.
+
+    Returns:
+        MDAnalysis selection string for low-variance residues.
+    """
     result = calc_low_variance_residues(u_list, selection)
 
     residues = result[-remain_res_num][1]
