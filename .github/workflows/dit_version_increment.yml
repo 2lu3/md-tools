@@ -6,11 +6,6 @@ on:
       - main
     paths:
       - 'dit/**'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'dit/**'
   workflow_dispatch:
 
 jobs:
@@ -19,24 +14,23 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - name: install poetry
-      run: |
-        pip3 install -U poetry
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
 
     - name: Increment version
       run: |
         cd dit
-        poetry version patch
+        uv version --bump patch
 
     - name: Commit and push
       run: |
         git remote set-url origin https://github-actions:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add -A
-        git commit -am "Increment version"
+        git add dit/pyproject.toml dit/uv.lock
+        git commit -m "Increment version" || echo "No changes"
         git push
 
     - name: Notify discord

@@ -1,7 +1,6 @@
 # md-tools
 
-This repository contains some useful tools to performe molecular dynamics simulation.
-
+This repository contains some useful tools to perform molecular dynamics simulation.
 
 ## pytool
 
@@ -10,38 +9,20 @@ pip install git+https://github.com/2lu3/md-tools.git#subdirectory=pytool
 pip install git+https://github.com/2lu3/md-tools.git#subdirectory=dit
 ```
 
-## DVC
+## dit
 
-```
-pipx install dvc
+MD 向けの大容量ファイル版管理（DVC 非依存）。詳細は [dit/README.md](dit/README.md)。
 
-dvc init
+```bash
+pip install git+https://github.com/2lu3/md-tools.git#subdirectory=dit
 
-dvc remote add -d minio s3://name
-dvc remote modify minio endpointurl URL
-```
-
-```
-dvc add --glob "**/*.dcd"
-dvc add --glob "**/*.dvl"
-dvc add --glob "**/*.rst"
+dit init --remote-url s3://bucket/prefix --endpoint-url https://minio.example.com
+# edit dit.toml [track].patterns as needed
+dit scope add data/07_production
+dit sync
 ```
 
-
-.git/hooks/pre-commit
-
-```
-#!/bin/bash
-
-
-# dcd/dvl/rst file should not be staged
-if git diff --cached --name-only | grep -E '\.(dcd|dvl|rst)$'; then
-  echo "エラー: *.dcd, *.dvl, *.rst ファイルがステージされています。"
-  echo "これらのファイルはコミットに含めないでください。"
-  exit 1
-fi
-```
-
+`git commit` 時に pre-commit フックが `dit add` を実行し、`*.dit` ポインタを自動ステージする。
 
 ## .env and .envrc
 

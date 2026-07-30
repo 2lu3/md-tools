@@ -1,23 +1,38 @@
-[tool.poetry]
+[project]
 name = "dit"
-version = "0.1.58"
-description = ""
-authors = ["2lu3 <hi2lu3@gmail.com>"]
+version = "0.2.0"
+description = "MD-oriented large-file versioning (DVC-independent)"
 readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "2lu3", email = "hi2lu3@gmail.com" }]
+dependencies = [
+    "alive-progress>=3.2.0,<4.0.0",
+    "blake3>=1.0.0,<2.0.0",
+    "boto3>=1.35.0,<2.0.0",
+    "click>=8.1.7,<9.0.0",
+    "loguru>=0.7.0,<0.8.0",
+    "natsort>=8.4.0,<9.0.0",
+    "pathspec>=0.12.0,<1.0.0",
+    "tomli>=2.0.0,<3.0.0; python_version < '3.11'",
+    "tomli-w>=1.0.0,<2.0.0",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.9, <4.0"
-loguru = "^0.7.3"
-black = "^24.10.0"
-natsort = "^8.4.0"
-alive-progress = "^3.2.0"
+[project.scripts]
+dit = "dit.main:main"
 
-[tool.poetry.group.dev.dependencies]
-black = "^24.10.0"
+[dependency-groups]
+dev = [
+    "black>=24.10.0,<25.0.0",
+    "moto[s3]>=5.0.0,<6.0.0",
+    "pytest>=8.0.0,<9.0.0",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling>=1.26.0"]
+build-backend = "hatchling.build"
 
-[tool.poetry.scripts]
-dit = 'dit.main:main'
+[tool.hatch.build.targets.wheel]
+packages = ["src/dit"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
