@@ -1,3 +1,5 @@
+"""dit status command."""
+
 from __future__ import annotations
 
 import click
@@ -13,6 +15,7 @@ from dit.core.tracker import iter_pointer_files, iter_tracked_files
 
 @click.command("status")
 def status_cmd() -> None:
+    """Show tracked file status relative to pointers and scope."""
     try:
         repo = require_initialized()
         config = load_config(repo)
@@ -37,7 +40,8 @@ def status_cmd() -> None:
                 mark = "↓" if scope.contains(rel) else "."
                 click.echo(f"{mark} {rel}")
                 continue
-            assert pointer is not None and data_path is not None
+            if pointer is None or data_path is None:
+                continue
             digest = resolve_content_hash(repo, index, data_path)
             if digest != pointer.hash:
                 click.echo(f"M {rel}")

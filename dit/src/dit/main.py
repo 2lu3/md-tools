@@ -1,3 +1,5 @@
+"""CLI entrypoint for dit."""
+
 from __future__ import annotations
 
 import click
@@ -16,6 +18,7 @@ def cli() -> None:
 
 
 def main() -> None:
+    """Register commands and invoke the Click group."""
     cli.add_command(init_cmd)
     cli.add_command(add_cmd)
     cli.add_command(status_cmd)

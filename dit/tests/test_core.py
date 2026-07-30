@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import os
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import boto3
 import pytest
@@ -16,8 +15,11 @@ from dit.core.repo import Repo
 from dit.core.scope import Scope
 from dit.core.tracker import build_track_spec, is_tracked_path, iter_tracked_files
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-@pytest.fixture()
+
+@pytest.fixture
 def git_repo(tmp_path: Path) -> Repo:
     root = tmp_path / "proj"
     root.mkdir()
@@ -44,9 +46,7 @@ def test_stat_index_skips_rehash(tmp_path: Path) -> None:
     path.write_bytes(b"data")
     size, mtime_ns, inode = file_stat_tuple(path)
     with StatIndex(db) as index:
-        index.upsert(
-            IndexEntry("f.dcd", size, mtime_ns, inode, "blake3:dead", None)
-        )
+        index.upsert(IndexEntry("f.dcd", size, mtime_ns, inode, "blake3:dead", None))
         entry = index.get("f.dcd")
         assert entry is not None
         assert stats_match(entry, size, mtime_ns, inode)
@@ -54,9 +54,9 @@ def test_stat_index_skips_rehash(tmp_path: Path) -> None:
 
 def test_track_patterns_extension_and_dir() -> None:
     spec = build_track_spec(["*.dcd", "data/**/out/", "!data/00_scratch/"])
-    assert is_tracked_path("foo.dcd", False, spec)
-    assert is_tracked_path("data/01/out/a.bin", False, spec)
-    assert not is_tracked_path("data/00_scratch/x.dcd", False, spec)
+    assert is_tracked_path("foo.dcd", is_dir=False, track_spec=spec)
+    assert is_tracked_path("data/01/out/a.bin", is_dir=False, track_spec=spec)
+    assert not is_tracked_path("data/00_scratch/x.dcd", is_dir=False, track_spec=spec)
 
 
 def test_iter_tracked_files(git_repo: Repo) -> None:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import boto3
 from moto import mock_aws
@@ -10,6 +10,9 @@ from dit.core.config import default_init_config
 from dit.core.repo import Repo
 from dit.core.scope import Scope
 from dit.core.sync_service import SyncAction, run_sync
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _init_repo(tmp_path: Path) -> Repo:

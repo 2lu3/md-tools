@@ -1,3 +1,5 @@
+"""dit scope commands."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -10,12 +12,13 @@ from dit.core.scope import Scope
 
 @click.group("scope")
 def scope_group() -> None:
-    pass
+    """Manage directories included in sync scope."""
 
 
 @scope_group.command("add")
 @click.argument("directory", type=click.Path(exists=True, file_okay=False, path_type=Path))
 def scope_add(directory: Path) -> None:
+    """Add a directory to sync scope."""
     try:
         repo = require_initialized()
         rel = Scope(repo).add(directory.resolve())
@@ -27,6 +30,7 @@ def scope_add(directory: Path) -> None:
 @scope_group.command("remove")
 @click.argument("directory")
 def scope_remove(directory: str) -> None:
+    """Remove a directory from sync scope."""
     try:
         repo = require_initialized()
         scope = Scope(repo)
@@ -39,6 +43,7 @@ def scope_remove(directory: str) -> None:
 
 @scope_group.command("list")
 def scope_list() -> None:
+    """List directories currently in sync scope."""
     try:
         repo = require_initialized()
         for directory in Scope(repo).list():

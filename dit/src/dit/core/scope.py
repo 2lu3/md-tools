@@ -1,49 +1,60 @@
+"""Directory scope persisted under .dit/scope.toml."""
+
 from __future__ import annotations
 
-import sys
+import tomllib
 from pathlib import Path
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
+from typing import TYPE_CHECKING
 
 import tomli_w
 from natsort import natsorted
 
-from dit.core.repo import Repo
+from dit.core.errors import ConfigError
+
+if TYPE_CHECKING:
+    from dit.core.repo import Repo
 
 
 class Scope:
+    """Managed set of directories tracked by dit."""
+
     def __init__(self, repo: Repo) -> None:
+        """Load scope state for a repository."""
         self.repo = repo
         self._directories: set[str] = set()
         self._load()
 
     @property
     def directories(self) -> set[str]:
+        """Return a copy of scoped directory paths."""
         return set(self._directories)
 
     def add(self, dir_path: Path) -> str:
+        """Add a directory to scope and persist."""
         if not dir_path.is_dir():
-            raise NotADirectoryError(f"{dir_path} is not a directory")
+            msg = f"{dir_path} is not a directory"
+            raise ConfigError(msg)
         rel = self.repo.rel(dir_path)
         self._directories.add(rel)
         self._save()
         return rel
 
     def remove(self, dir_path: Path | str) -> str:
+        """Remove a directory from scope and persist."""
         rel = dir_path if isinstance(dir_path, str) else self.repo.rel(Path(dir_path))
         if rel not in self._directories:
-            raise KeyError(f"{rel} is not in scope: {natsorted(self._directories)}")
+            msg = f"{rel} is not in scope: {natsorted(self._directories)}"
+            raise ConfigError(msg)
         self._directories.remove(rel)
         self._save()
         return rel
 
     def list(self) -> list[str]:
+        """Return scoped directories in natural sort order."""
         return natsorted(self._directories)
 
     def contains(self, rel_path: str) -> bool:
+        """Return whether a relative path falls under scope."""
         if not self._directories:
             return False
         for directory in self._directories:
@@ -60,7 +71,8 @@ class Scope:
             data = tomllib.load(f)
         directories = data.get("directories") or []
         if not isinstance(directories, list):
-            raise ValueError(f"invalid scope file: {path}")
+            msg = f"invalid scope file: {path}"
+            raise TypeError(msg)
         self._directories = {str(d) for d in directories}
 
     def _save(self) -> None:

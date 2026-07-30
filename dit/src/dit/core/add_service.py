@@ -1,17 +1,27 @@
+"""Stage tracked files as dit pointer files."""
+
 from __future__ import annotations
 
+import shutil
 import subprocess
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+from loguru import logger
 
 from dit.core.config import load_config
 from dit.core.content import resolve_content_hash, write_pointer_for_file
+from dit.core.errors import RepoError
 from dit.core.index import StatIndex
 from dit.core.pointer import read_pointer
-from dit.core.repo import Repo
 from dit.core.tracker import iter_pointer_files, iter_tracked_files
 
+if TYPE_CHECKING:
+    from dit.core.repo import Repo
 
-def run_add(repo: Repo, quiet: bool = False, prune: bool = False) -> int:
+
+def run_add(repo: Repo, *, quiet: bool = False, prune: bool = False) -> int:
+    """Write or update pointer files for tracked paths."""
     config = load_config(repo)
     changed = 0
     with StatIndex(repo.index_db) as index:
@@ -30,13 +40,13 @@ def run_add(repo: Repo, quiet: bool = False, prune: bool = False) -> int:
                 _git_add(repo, repo.root / pointer.pointer_relpath)
                 changed += 1
                 if not quiet:
-                    print(f"add {pointer.path}")
+                    logger.info(f"add {pointer.path}")
         if prune:
-            changed += _prune_orphaned_pointers(repo, tracked_rels, quiet)
+            changed += _prune_orphaned_pointers(repo, tracked_rels, quiet=quiet)
     return changed
 
 
-def _prune_orphaned_pointers(repo: Repo, tracked_rels: set[str], quiet: bool) -> int:
+def _prune_orphaned_pointers(repo: Repo, tracked_rels: set[str], *, quiet: bool) -> int:
     removed = 0
     for pointer_path in iter_pointer_files(repo):
         try:
@@ -49,14 +59,19 @@ def _prune_orphaned_pointers(repo: Repo, tracked_rels: set[str], quiet: bool) ->
         _git_add(repo, pointer_path)
         removed += 1
         if not quiet:
-            print(f"prune {pointer.path}")
+            logger.info(f"prune {pointer.path}")
     return removed
 
 
 def _git_add(repo: Repo, path: Path) -> None:
+    git = shutil.which("git")
+    if git is None:
+        msg = "git executable not found"
+        raise RepoError(msg)
     try:
-        subprocess.run(
-            ["git", "add", "--", str(path)],
+        # git path from shutil.which; args are fixed literals plus a Path
+        subprocess.run(  # noqa: S603
+            [git, "add", "--", str(path)],
             cwd=repo.root,
             check=False,
             capture_output=True,
@@ -64,4 +79,5 @@ def _git_add(repo: Repo, path: Path) -> None:
             timeout=60,
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
-        raise RuntimeError(f"git add failed for {path}: {exc}") from exc
+        msg = f"git add failed for {path}: {exc}"
+        raise RepoError(msg) from exc

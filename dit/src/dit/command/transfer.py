@@ -1,3 +1,5 @@
+"""dit push, pull, and sync commands."""
+
 from __future__ import annotations
 
 import click
@@ -17,7 +19,8 @@ def _print_results(results: list) -> int:
 
 @click.command("push")
 @click.option("--dry-run", is_flag=True)
-def push_cmd(dry_run: bool) -> None:
+def push_cmd(*, dry_run: bool) -> None:
+    """Upload local objects referenced by in-scope pointers."""
     try:
         repo = require_initialized()
         results = run_push(repo, dry_run=dry_run)
@@ -30,7 +33,8 @@ def push_cmd(dry_run: bool) -> None:
 
 @click.command("pull")
 @click.option("--dry-run", is_flag=True)
-def pull_cmd(dry_run: bool) -> None:
+def pull_cmd(*, dry_run: bool) -> None:
+    """Download remote objects for in-scope pointers."""
     try:
         repo = require_initialized()
         results = run_pull(repo, dry_run=dry_run)
@@ -48,7 +52,8 @@ def pull_cmd(dry_run: bool) -> None:
     is_flag=True,
     help="after git fetch --all --prune, delete unreferenced remote objects",
 )
-def sync_cmd(dry_run: bool, prune_remote: bool) -> None:
+def sync_cmd(*, dry_run: bool, prune_remote: bool) -> None:
+    """Push, pull, and apply scope deletes for in-scope pointers."""
     try:
         repo = require_initialized()
         results = run_sync(repo, dry_run=dry_run, prune_remote=prune_remote)
