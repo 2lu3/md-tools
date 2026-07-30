@@ -1,14 +1,15 @@
-import glob
-import os
+"""Increment numbered directory prefixes."""
+
 import shutil
 import sys
+from pathlib import Path
 
 import click
 from loguru import logger
 from natsort import natsorted
 
 
-def _setup_logger(verbose: bool) -> None:
+def _setup_logger(*, verbose: bool) -> None:
     if verbose:
         logger.remove()
         logger.add(
@@ -19,21 +20,25 @@ def _setup_logger(verbose: bool) -> None:
         logger.remove()
 
 
-def _glob_numbered_dirs():
-    """i.e.
+def _glob_numbered_dirs() -> list[str]:
+    """Return numbered directories in natural sort order.
+
+    i.e.
     .
     ├── 00_hello
     ├── 01_hoge
     ├── 02_fuga
     └── 03_piyo.
     """
-    dirs = glob.glob("[0-9][0-9]_*/")
-    normalized_dirs = [os.path.normpath(d) for d in dirs]
+    dirs = [path for path in Path().glob("[0-9][0-9]_*") if path.is_dir()]
+    normalized_dirs = [str(path) for path in dirs]
     return natsorted(normalized_dirs)
 
 
-def _increment_directory_index(dir_name: str, add_num: int):
-    """i.e.
+def _increment_directory_index(dir_name: str, add_num: int) -> str:
+    """Increment a directory number by the requested amount.
+
+    i.e.
     03_piyo -> 04_piyo.
     """
     number = int(dir_name[:2])
@@ -44,21 +49,27 @@ def _increment_directory_index(dir_name: str, add_num: int):
     return new_dir
 
 
-def increment_directory_index(start_dir: str, add_num: int = 1, verbose: bool = False) -> None:
-    """i.e.
+def increment_directory_index(
+    start_dir: str,
+    add_num: int = 1,
+    verbose: bool = False,  # noqa: FBT001, FBT002
+) -> None:
+    """Increment numbered directories from the selected start directory.
+
+    i.e.
     start_dir: 02_fuga
     00_hello -> 00_hello
     01_hoge -> 01_hoge
     02_fuga -> 03_fuga
     03_piyo -> 04_piyo.
     """
-    _setup_logger(verbose)
+    _setup_logger(verbose=verbose)
 
     numbered_dirs = _glob_numbered_dirs()
     logger.info(f"Found {len(numbered_dirs)} directories. {numbered_dirs}")
 
     # get index of start_dir
-    start_idx = numbered_dirs.index(os.path.normpath(start_dir))
+    start_idx = numbered_dirs.index(str(Path(start_dir)))
 
     # increment index
     for dir_name in numbered_dirs[start_idx:]:
@@ -70,5 +81,10 @@ def increment_directory_index(start_dir: str, add_num: int = 1, verbose: bool = 
 @click.argument("start_dir", type=click.Path(exists=True))
 @click.option("--add_num", "-a", default=1, help="add number")
 @click.option("--verbose", "-v", is_flag=True, help="Verbose mode")
-def increment_directory_index_to_command(start_dir, add_num, verbose) -> None:
+def increment_directory_index_to_command(
+    start_dir: str,
+    add_num: int,
+    verbose: bool,  # noqa: FBT001
+) -> None:
+    """Run the increment-dir command-line interface."""
     increment_directory_index(start_dir, add_num, verbose)
