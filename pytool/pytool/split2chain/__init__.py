@@ -1,0 +1,1 @@
+"""Split structures into chains."""

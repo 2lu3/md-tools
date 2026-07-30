@@ -1,7 +1,6 @@
-import os
 import glob
-import shutil
-from typing import Optional
+import os
+
 from loguru import logger
 
 from .util import copy_file_safe
@@ -10,13 +9,9 @@ from .util import copy_file_safe
 def copy_toppar_files(
     toppar_dir: str,
     output_dir: str,
-    files_to_copy: list[tuple[str, str]] = [
-        ("rtf", "top_all36_prot.rtf"),
-        ("prm", "par_all36m_prot.prm"),
-        ("str", "toppar_water_ions.str"),
-    ],
-):
-    """topparからMDに必要なファイルをコピーする
+    files_to_copy: list[tuple[str, str]] | None = None,
+) -> None:
+    """topparからMDに必要なファイルをコピーする.
 
     Args:
         toppar_dir (str): topparディレクトリへのパス
@@ -26,17 +21,19 @@ def copy_toppar_files(
     Examples:
         >>> copy_toppar_files("../01_data/toppar", "production_1")
     """
-
+    if files_to_copy is None:
+        files_to_copy = [("rtf", "top_all36_prot.rtf"), ("prm", "par_all36m_prot.prm"), ("str", "toppar_water_ions.str")]
     def find_toppar_file(toppar_dir: str, file_name: str):
         assert os.path.exists(toppar_dir), f"directory {toppar_dir} not found"
         file_paths = glob.glob(os.path.join(toppar_dir, file_name))
         if len(file_paths) == 0:
-            raise FileNotFoundError(f"{file_name} not found in {toppar_dir}")
-        elif len(file_paths) > 1:
-            raise RuntimeError(f"Multiple {file_name} found in {toppar_dir}")
-        else:
-            logger.debug(f"Found {file_name} in {toppar_dir}")
-            return file_paths[0]
+            msg = f"{file_name} not found in {toppar_dir}"
+            raise FileNotFoundError(msg)
+        if len(file_paths) > 1:
+            msg = f"Multiple {file_name} found in {toppar_dir}"
+            raise RuntimeError(msg)
+        logger.debug(f"Found {file_name} in {toppar_dir}")
+        return file_paths[0]
 
     for subdir, filename in files_to_copy:
         file_path = find_toppar_file(toppar_dir, filename)
@@ -44,9 +41,9 @@ def copy_toppar_files(
 
 
 def copy_structure_files(
-    output_dir: str, pdb_file: Optional[str] = None, psf_file: Optional[str] = None, rst_file: Optional[str] = None
-):
-    """MDに必要な構造ファイル(PDB, PSF, RST)をコピーする
+    output_dir: str, pdb_file: str | None = None, psf_file: str | None = None, rst_file: str | None = None
+) -> None:
+    """MDに必要な構造ファイル(PDB, PSF, RST)をコピーする.
 
     Args:
         output_dir (str): 出力先ディレクトリへのパス
@@ -62,8 +59,8 @@ def copy_structure_files(
         copy_file_safe(rst_file, output_dir, "rst", "input.rst")
 
 
-def clean_directory(output_dir: str, is_delete_output: bool = False, additional_dirs: list[str] = []):
-    """output_dirを新しいプロジェクトファイルを生成できるように初期化する
+def clean_directory(output_dir: str, is_delete_output: bool = False, additional_dirs: list[str] | None = None) -> None:
+    """output_dirを新しいプロジェクトファイルを生成できるように初期化する.
 
     - .dvcファイルは削除しない
     - .gitignoreファイルは削除しない
@@ -73,12 +70,13 @@ def clean_directory(output_dir: str, is_delete_output: bool = False, additional_
         is_delete_output (str): out/を削除するか(Trueなら削除)
         additional_dirs (list[str]): 追加で生成するディレクトリ
     """
-
+    if additional_dirs is None:
+        additional_dirs = []
     files = glob.glob(os.path.join(output_dir, "**", "*"), recursive=True)
     for file in files:
         if not os.path.isfile(file):
             continue
-        if file.endswith(".dvc") or file.endswith(".gitignore"):
+        if file.endswith((".dvc", ".gitignore")):
             continue
 
         if file.startswith(os.path.join(output_dir, "out")):
@@ -97,14 +95,17 @@ def clean_directory(output_dir: str, is_delete_output: bool = False, additional_
 
 def init_directory(output_dir: str):
     """output_dirを初期化する
-    すべてのファイルが削除される
+    すべてのファイルが削除される.
 
     Args:
         output_dir (str): output_dir
     """
-    raise NotImplementedError("This function is deprecated. Use clean_directory instead.")
+    msg = "This function is deprecated. Use clean_directory instead."
+    raise NotImplementedError(msg)
 
-def _create_directory(output_dir: str, additional_dirs: list[str] = []):
+def _create_directory(output_dir: str, additional_dirs: list[str] | None = None) -> None:
+    if additional_dirs is None:
+        additional_dirs = []
     directories = ["inp", "out", "rtf", "prm", "str", "pdb", "psf", "rst"]
     directories.extend(additional_dirs)
 

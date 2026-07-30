@@ -1,6 +1,7 @@
+import os
 from argparse import ArgumentParser
 from glob import glob
-import os
+
 from matplotlib.figure import Figure
 
 from .common.fig_by_column import fig_by_column
@@ -67,7 +68,7 @@ def analyze_productions(
     ]
 
 
-def command():
+def command() -> None:
     parser = ArgumentParser()
     parser.add_argument("--project_dirs", nargs="+", type=str, default=None)
     parser.add_argument("--root-dir", type=str, default=None)

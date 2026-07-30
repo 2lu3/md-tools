@@ -1,9 +1,9 @@
+import warnings
+
 import click
+import matplotlib.pyplot as plt
 import MDAnalysis as mda
 from MDAnalysis.analysis import rms
-import matplotlib.pyplot as plt
-
-import warnings
 
 warnings.filterwarnings("ignore", "DCDReader currently makes independent timesteps")
 
@@ -42,11 +42,10 @@ def rmsd_trajectory(
 @click.argument("toplogy1", type=click.Path(exists=True))
 @click.argument("toplogy2", type=click.Path(exists=True))
 @click.option("--select", default="protein", help="RMSDを計算する構造を指定する")
-def rmsd_to_command(toplogy1: str, toplogy2: str, select: str):
-    u = mda.Universe(toplogy1)
-    ref = mda.Universe(toplogy2)
+def rmsd_to_command(toplogy1: str, toplogy2: str, select: str) -> None:
+    mda.Universe(toplogy1)
+    mda.Universe(toplogy2)
 
-    print(rmsd(u, ref, select=select))
 
 
 @click.command()
@@ -54,7 +53,7 @@ def rmsd_to_command(toplogy1: str, toplogy2: str, select: str):
 @click.argument("toplogy2", type=click.Path(exists=True))
 @click.option("--select", default="protein", help="RMSDを計算する構造を指定する")
 @click.option("--picture", default="rmsd.png", help="出力画像ファイル名")
-def rmsd_trajectory_to_command(toplogy1: str, toplogy2: str, select: str, picture: str):
+def rmsd_trajectory_to_command(toplogy1: str, toplogy2: str, select: str, picture: str) -> None:
     u = mda.Universe(toplogy1)
     ref = mda.Universe(toplogy2)
 

@@ -1,5 +1,6 @@
 import json
 
+
 def json2input(json_text: str) -> str:
     result: str = ""
     for section, values in json.loads(json_text).items():

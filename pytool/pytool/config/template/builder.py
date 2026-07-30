@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 
-from pytool.config.render_template import render2file
-from pytool.directory import (
-    copy_toppar_files,
-    copy_structure_files,
-    clean_directory,
-)
-from pytool.structure import get_box_size
 import argparse
 import os
 
-def create_project(project_dir: str, is_clean: bool, extra_keywords: dict = {}):
+from pytool.config.render_template import render2file
+from pytool.directory import (
+    clean_directory,
+    copy_structure_files,
+    copy_toppar_files,
+)
+
+
+def create_project(project_dir: str, is_clean: bool, extra_keywords: dict | None = None) -> None:
+    if extra_keywords is None:
+        extra_keywords = {}
     project_name = os.path.basename(os.path.normpath(project_dir))
     clean_directory(project_dir, is_clean)
     copy_toppar_files("../01_data/c36", project_dir)
@@ -37,13 +40,13 @@ def create_project(project_dir: str, is_clean: bool, extra_keywords: dict = {}):
     for i in range(keywords["index_num"]):
         keywords["index"] = i
         render2file(f"{project_dir}/inp/{keywords['mode']}{i}.inp", f"{keywords['mode']}0.inp", keywords)
-        render2file(f"{project_dir}/job{i}.sh", f"job.sh", keywords)
+        render2file(f"{project_dir}/job{i}.sh", "job.sh", keywords)
         os.chmod(f"{project_dir}/job{i}.sh", 0o755)
 
     render2file(f"{project_dir}/submit.sh", "submit.sh", keywords)
     os.chmod(f"{project_dir}/submit.sh", 0o755)
 
-def create_benchmark():
+def create_benchmark() -> None:
     nodes = [1, 2, 4, 8]
     proc_per_node = 24
     thread = 2
@@ -58,7 +61,7 @@ def create_benchmark():
         create_project(f"benchmarks/project_{node}", True, keywords)
 
 
-def main(is_clean: bool):
+def main(is_clean: bool) -> None:
     projects = []
     for project in projects:
         create_project(f"projects/{project}", is_clean)

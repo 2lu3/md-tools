@@ -1,5 +1,5 @@
-from tarfile import LENGTH_NAME
-from loguru import logger
+import itertools
+
 import pandas as pd
 
 
@@ -17,8 +17,8 @@ def read_log(log_paths: list[str]) -> pd.DataFrame:
     df = pd.DataFrame(columns=_read_column_names(log_paths))
 
     for log_path in log_paths:
-        with open(log_path, "r") as f:
-            for line in f.readlines():
+        with open(log_path) as f:
+            for line in f:
                 if "INFO:" not in line:
                     continue
 
@@ -41,7 +41,7 @@ def read_log(log_paths: list[str]) -> pd.DataFrame:
 
 def _is_numeric_row(row: str):
     elements = [x for x in row.split(" ") if x != ""]
-    return any([x.isnumeric() for x in elements])
+    return any(x.isnumeric() for x in elements)
 
 
 def _read_column_names(log_paths: list[str]):
@@ -65,15 +65,14 @@ def _read_column_names(log_paths: list[str]):
 def _read_info_lines(log_paths: list[str]) -> list[list[str]]:
     lines = []
     for log_path in log_paths:
-        with open(log_path, "r") as f:
-            lines.append([line for line in f.readlines() if "INFO:" in line])
+        with open(log_path) as f:
+            lines.append([line for line in f if "INFO:" in line])
 
     return lines
 
 
 def _normalize_time(time_list: list[float]) -> list[float]:
-    """
-    MD計算を分割して行った場合、分割された計算ごとに時刻が0スタートになるので修正する
+    """MD計算を分割して行った場合、分割された計算ごとに時刻が0スタートになるので修正する.
 
     Args:
         time_list (list[float]): 時刻のリスト
@@ -87,13 +86,12 @@ def _normalize_time(time_list: list[float]) -> list[float]:
         >>> normalize_time([10, 20, 30, 10, 20, 30])
         [10, 20, 30, 40, 50, 60]
     """
-
     # 時刻が1つなら修正しなくて良い
     if len(time_list) <= 1:
         return list(time_list)
 
     # 常に t[i] < t[i+1] ならtimeがリセットされていないので、修正しなくていい
-    if all(a < b for a, b in zip(time_list, time_list[1:])):
+    if all(a < b for a, b in itertools.pairwise(time_list)):
         return list(time_list)
 
     result = []

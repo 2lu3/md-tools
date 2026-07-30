@@ -1,10 +1,14 @@
 import subprocess
+
 import click
 
-def dvc_add(additional_globs=[]):
+
+def dvc_add(additional_globs=None) -> None:
+    if additional_globs is None:
+        additional_globs = []
     subprocess.run(["dvc", "add", "--glob", "**/*.dcd", "**/*.rst", "**/*.dvl", "**/*.npy", "**/*.pkl", "**/*.tar", *additional_globs])
 
 @click.command()
 @click.option("--additional_globs", "-a", multiple=True, help="additional globs to add")
-def dvc_add_to_command(additional_globs):
+def dvc_add_to_command(additional_globs) -> None:
     dvc_add(additional_globs)

@@ -1,23 +1,20 @@
-from typing import Union
-import MDAnalysis as mda
 import warnings
+
+import MDAnalysis as mda
 import numpy as np
 from loguru import logger
 
 warnings.filterwarnings("ignore")
 
 
-def load_position_resid(u_list: list[mda.Universe], selection: Union[str, list[str]]):
+def load_position_resid(u_list: list[mda.Universe], selection: str | list[str]):
     logger.debug("Loading positions")
 
-    if isinstance(selection, str):
-        selections = [selection] * len(u_list)
-    else:
-        selections = selection
+    selections = [selection] * len(u_list) if isinstance(selection, str) else selection
 
     positions = []
     resids = []
-    for u, sel in zip(u_list, selections):
+    for u, sel in zip(u_list, selections, strict=False):
         for _ in u.trajectory:
             atoms = u.select_atoms(sel)
             positions.append(atoms.positions)
@@ -28,12 +25,11 @@ def load_position_resid(u_list: list[mda.Universe], selection: Union[str, list[s
 
 
 def kabsch(P, Q):
-    """
-    Kabsch アルゴリズムを用いて、点群 P を Q に最適に重ね合わせる回転 R と並進 t を計算する。
+    """Kabsch アルゴリズムを用いて、点群 P を Q に最適に重ね合わせる回転 R と並進 t を計算する。
     P, Q: (N, 3) の numpy 配列
     Returns:
         R: 回転行列 (3, 3)
-        t: 並進ベクトル (3,)
+        t: 並進ベクトル (3,).
     """
     # 各点群の重心を計算
     centroid_P = np.mean(P, axis=0)
@@ -44,7 +40,7 @@ def kabsch(P, Q):
     # 共分散行列の計算
     H = np.dot(P_centered.T, Q_centered)
     # SVD 分解
-    U, S, Vt = np.linalg.svd(H)
+    U, _S, Vt = np.linalg.svd(H)
     V = Vt.T
     # 回転行列 R = V * U^T（鏡像反転を防ぐための調整）
     d = np.linalg.det(np.dot(V, U.T))
@@ -57,9 +53,9 @@ def kabsch(P, Q):
 
 
 def align_positions(positions):
-    """
-    全フレームの座標を、平均値に対してアライメントする。
-    positions: shape (n_frames, n_residues, 3)
+    """全フレームの座標を、平均値に対してアライメントする。
+    positions: shape (n_frames, n_residues, 3).
+
     Returns:
         aligned_positions: 同じ shape のアライメント後の座標
     """
@@ -76,9 +72,9 @@ def align_positions(positions):
 
 
 def compute_rmsf(aligned_positions):
-    """
-    各残基ごとの RMSF (Root Mean Square Fluctuation) を計算する。
-    aligned_positions: shape (n_frames, n_residues, 3)
+    """各残基ごとの RMSF (Root Mean Square Fluctuation) を計算する。
+    aligned_positions: shape (n_frames, n_residues, 3).
+
     Returns:
         rmsf: (n_residues,) 各残基の RMSF 値（Å単位）
     """
@@ -89,8 +85,7 @@ def compute_rmsf(aligned_positions):
     # 各点での二乗和
     squared_diffs = np.sum(diffs**2, axis=2)  # shape: (n_frames, n_residues)
     # フレームごとの平均二乗偏差 → ルートを取る
-    rmsf = np.sqrt(np.mean(squared_diffs, axis=0))  # shape: (n_residues,)
-    return rmsf
+    return np.sqrt(np.mean(squared_diffs, axis=0))  # shape: (n_residues,)
 
 
 
@@ -131,7 +126,7 @@ def calc_low_variance(positions: np.ndarray) -> tuple[list[float], list[np.ndarr
 
 
 def calc_low_variance_residues(
-    u_list: list[mda.Universe], selection: Union[str, list[str]] = "protein and name CA"
+    u_list: list[mda.Universe], selection: str | list[str] = "protein and name CA"
 ):
     positions: np.ndarray
     resids: list
@@ -143,7 +138,7 @@ def calc_low_variance_residues(
     avg_rmsfs, candidate_masks = calc_low_variance(positions)
 
     result: list[tuple[float, list[str]]] = []
-    for candidate, rmsf in zip(candidate_masks, avg_rmsfs):
+    for candidate, rmsf in zip(candidate_masks, avg_rmsfs, strict=False):
         residues = list(map(str, resids[0][candidate]))
         result.append((rmsf, residues))
 
@@ -153,7 +148,7 @@ def calc_low_variance_residues(
 def select_low_variance_residues(
     u_list: list[mda.Universe],
     remain_res_num: int,
-    selection: Union[str, list[str]] = "protein and name CA",
+    selection: str | list[str] = "protein and name CA",
 ):
     result = calc_low_variance_residues(u_list, selection)
 

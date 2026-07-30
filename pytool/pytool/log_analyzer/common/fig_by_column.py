@@ -1,11 +1,13 @@
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
 import os
-import numpy as np
 from dataclasses import dataclass, field
 from itertools import cycle
+
+import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import cm
+from matplotlib.figure import Figure
 from natsort import natsorted
+
 from .log_glob import glob_log_files
 from .reader import read_log
 
@@ -52,9 +54,9 @@ def fig_by_column(
     data_list = read_projects_log(project_dirs, column_name)
 
 
-    file_names = set(
-        [file_name for data in data_list for file_name in data.time.keys()]
-    )
+    file_names = {
+        file_name for data in data_list for file_name in data.time
+    }
     file_names = natsorted(file_names)
 
     fig = plt.figure(figsize=figsize, constrained_layout=True)
@@ -66,7 +68,7 @@ def fig_by_column(
         linestyle_cycler = cycle(linestyles)
 
         for data in data_list:
-            if file_name in data.time.keys():
+            if file_name in data.time:
                 if use_moving_average:
                     moving_average_x = np.convolve(
                         data.time[file_name],

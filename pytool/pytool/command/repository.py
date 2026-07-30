@@ -1,20 +1,22 @@
-from argparse import ArgumentParser
 import os
 import shutil
-import requests
 import subprocess
+from argparse import ArgumentParser
+
+import requests
 from loguru import logger
 
-def _copy_from_template(file_name: str, out_path: str):
+
+def _copy_from_template(file_name: str, out_path: str) -> None:
     root_dir = os.path.join(os.path.dirname(__file__), "template")
     shutil.copy(os.path.join(root_dir, file_name), out_path)
 
-def _create_dirs():
+def _create_dirs() -> None:
     dirs = ["software", "tool", "data"]
     for d in dirs:
         os.makedirs(d, exist_ok=True)
 
-def _download_latest_genesis():
+def _download_latest_genesis() -> None:
     github_url = "https://api.github.com/repos/genesis-release-r-ccs/genesis/releases/latest"
 
     response = requests.get(github_url)
@@ -27,7 +29,7 @@ def _download_latest_genesis():
     with open("software/genesis.tar.gz", "wb") as f:
         f.write(response.content)
 
-def _install_genesis():
+def _install_genesis() -> None:
     os.makedirs("software/genesis", exist_ok=True)
     subprocess.run(["tar", "xvf", "software/genesis.tar.gz", "-C", "software/genesis", "--strip-components=1"])
 
@@ -37,20 +39,20 @@ def _install_genesis():
     subprocess.run(["make", "install"])
     os.chdir("../..")
 
-def _install_requirements():
+def _install_requirements() -> None:
     _copy_from_template("install_requirements.sh", "tool")
     subprocess.run(["bash", "tool/install_requirements.sh"])
 
-def _create_env():
+def _create_env() -> None:
     with open(".env", "w") as f:
         pass
 
     with open(".envrc", "w") as f:
         f.write("dotenv\n")
-        f.write("export PATH=\"$PATH:$(pwd)/tool\"\n")
-        f.write("export PATH=\"$PATH:$(pwd)/software/genesis/bin\"\n")
+        f.write('export PATH="$PATH:$(pwd)/tool"\n')
+        f.write('export PATH="$PATH:$(pwd)/software/genesis/bin"\n')
 
-def create_repository():
+def create_repository() -> None:
     _create_dirs()
 
     _copy_from_template("switch.py", "software")
@@ -63,7 +65,7 @@ def create_repository():
 
     logger.warning("AWSの環境変数やFUGAKU_USER_IDを設定してください")
 
-def to_command():
+def to_command() -> None:
     parser = ArgumentParser("MD simulation用のレポジトリを自動作成する")
 
     _ = parser.parse_args()

@@ -1,11 +1,12 @@
-import os
 import glob
+import os
+
 import natsort
 
 
 def glob_log_files(log_path: str):
     """ログファイルのパスを全て取得する
-    取得したログファイルはnatsortでソートされる
+    取得したログファイルはnatsortでソートされる.
 
     Args:
         log_path (str): *.log*ファイルが存在するディレクトリのパスもしくはログファイルそのもの
@@ -16,4 +17,5 @@ def glob_log_files(log_path: str):
         return natsort.natsorted(
             glob.glob(os.path.join(log_path, "**", "*.log*"), recursive=True)
         )
-    raise Exception(f"Invalid path: {log_path}")
+    msg = f"Invalid path: {log_path}"
+    raise Exception(msg)

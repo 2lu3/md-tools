@@ -1,8 +1,9 @@
 import click
 import MDAnalysis as mda
 
+
 def rename2charmm(u: mda.Universe):
-    """Rename atoms in a universe to CHARMM naming convention
+    """Rename atoms in a universe to CHARMM naming convention.
 
     Args:
         u (mda.Universe): A universe
@@ -13,7 +14,6 @@ def rename2charmm(u: mda.Universe):
         CD1 atom of ILE => CD
         C-terminal carboxyl oxygen O and OXT => OT1 and OT2
     """
-
     # Rename CD1 atom of ILE to CD
     u.select_atoms("resname ILE and name CD1").names = "CD"
 
@@ -32,14 +32,13 @@ def rename2charmm(u: mda.Universe):
 @click.command()
 @click.argument("input_pdb", type=click.Path(exists=True))
 @click.argument("output_pdb", type=click.Path(exists=False))
-def main(input_pdb: str, output_pdb: str):
-    """Rename atoms in a PDB file to CHARMM naming convention
+def main(input_pdb: str, output_pdb: str) -> None:
+    """Rename atoms in a PDB file to CHARMM naming convention.
 
     Args:
         input_pdb (str): Input PDB file name
         output_pdb (str): Output PDB file name
     """
-
     u = mda.Universe(input_pdb)
 
     renamed_u = rename2charmm(u)

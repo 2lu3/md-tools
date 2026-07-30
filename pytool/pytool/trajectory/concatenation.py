@@ -1,16 +1,16 @@
-from glob import glob
 import os
-from natsort import natsorted
-from loguru import logger
-import MDAnalysis as mda
-
 import warnings
+from glob import glob
+
+import MDAnalysis as mda
+from loguru import logger
+from natsort import natsorted
 
 warnings.filterwarnings("ignore")
 
 
 def _glob_dcd(dcds: list[str]):
-    """Glob DCD files from a list of dirs and files
+    """Glob DCD files from a list of dirs and files.
 
     Args:
         dcds (list[str]): A list of dirs and files
@@ -39,8 +39,8 @@ def concat_dcd(
     topology: str,
     dcds: list[str],
     output_name: str,
-):
-    """Concatenate DCD files
+) -> None:
+    """Concatenate DCD files.
 
     Args:
         topology (str): Topology file

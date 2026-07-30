@@ -1,17 +1,18 @@
+import os
 from argparse import ArgumentParser
+from dataclasses import dataclass
 from glob import glob
 from itertools import cycle
-import os
-from matplotlib.pyplot import cm
-import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
-from natsort import natsorted
-import numpy as np
-from dataclasses import dataclass
 
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.figure import Figure
+from matplotlib.pyplot import cm
+from natsort import natsorted
+
+from .common.fig_by_column import fig_by_column
 from .common.log_glob import glob_log_files
 from .common.reader import read_log
-from .common.fig_by_column import fig_by_column
 
 linestyles = ["-", "--", "-.", ":"]
 
@@ -59,9 +60,9 @@ def analyze_box_sizes(
 
     data_list = sorted(data_list, key=lambda x: x.project_name)
 
-    file_names = set(
-        [file_name for data in data_list for file_name in data.time.keys()]
-    )
+    file_names = {
+        file_name for data in data_list for file_name in data.time
+    }
     file_names = natsorted(file_names)
 
     fig = plt.figure(figsize=figsize, constrained_layout=True)
@@ -80,7 +81,7 @@ def analyze_box_sizes(
             ax.set_ylabel("Box Size (nm)")
 
             for data in data_list:
-                if file_name in data.time.keys():
+                if file_name in data.time:
                     if dim == "X":
                         y = data.x
                     elif dim == "Y":
@@ -88,7 +89,8 @@ def analyze_box_sizes(
                     elif dim == "Z":
                         y = data.z
                     else:
-                        raise ValueError(f"Invalid dimension {dim}")
+                        msg = f"Invalid dimension {dim}"
+                        raise ValueError(msg)
 
                     if use_moving_average:
                         moving_average_x = np.convolve(
@@ -149,7 +151,6 @@ def analyze_equilibrations(
     Returns:
         Figure:
     """
-
     fig_total_energy = fig_by_column(
         project_dirs,
         "TOTAL_ENE",
@@ -206,7 +207,7 @@ def analyze_equilibrations(
     ]
 
 
-def command():
+def command() -> None:
     parser = ArgumentParser()
     parser.add_argument("--project_dirs", nargs="+", type=str, default=None)
     parser.add_argument("--root-dir", type=str, default=None)

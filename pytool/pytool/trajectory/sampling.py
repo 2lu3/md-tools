@@ -1,30 +1,28 @@
 import argparse
+
 from MDAnalysis.lib.formats.libdcd import DCDFile
 
 
-def reduce_dcd(input_path: str, stride: int, out_path: str):
-    with DCDFile(input_path) as dcd:
-        print(dcd.header)
-        with DCDFile(
-            out_path,
-            "w",
-        ) as out:
-            print(dcd.header)
-            out.write_header(
-                remarks=dcd.header["remarks"],
-                natoms=dcd.header["natoms"],
-                istart=dcd.header["istart"] // stride,
-                nsavc=dcd.header["nsavc"] // stride,
-                delta=dcd.header["delta"] * stride,
-                is_periodic=dcd.header["is_periodic"],
-            )
+def reduce_dcd(input_path: str, stride: int, out_path: str) -> None:
+    with DCDFile(input_path) as dcd, DCDFile(
+        out_path,
+        "w",
+    ) as out:
+        out.write_header(
+            remarks=dcd.header["remarks"],
+            natoms=dcd.header["natoms"],
+            istart=dcd.header["istart"] // stride,
+            nsavc=dcd.header["nsavc"] // stride,
+            delta=dcd.header["delta"] * stride,
+            is_periodic=dcd.header["is_periodic"],
+        )
 
-            for i, ts in enumerate(dcd):
-                if i % stride == 0:
-                    out.write(ts[0], ts[1])
+        for i, ts in enumerate(dcd):
+            if i % stride == 0:
+                out.write(ts[0], ts[1])
 
 
-def reduce_dcd_to_command():
+def reduce_dcd_to_command() -> None:
     parser = argparse.ArgumentParser(
         description="Reduce the number of frames in a DCD file"
     )

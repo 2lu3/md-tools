@@ -1,19 +1,20 @@
 import os
 import shutil
+
 import click
 from loguru import logger
 
-def copy_template(output_dir: str):
-    """テンプレートのすべてのファイルをコピーする
+
+def copy_template(output_dir: str) -> None:
+    """テンプレートのすべてのファイルをコピーする.
 
     mode: min, eq, pr
     """
-
     source_dir = os.path.join(_template_dir())
     target_dir = os.path.join(output_dir, "template")
 
     shutil.copytree(source_dir, target_dir, dirs_exist_ok=True)
-    logger.info("copy template files to {}".format(target_dir))
+    logger.info(f"copy template files to {target_dir}")
 
     if not os.path.exists(os.path.join(output_dir, "builder.py")):
         shutil.copy(os.path.join(target_dir, "builder.py"), output_dir)
@@ -24,7 +25,7 @@ def copy_template(output_dir: str):
 
 @click.command()
 @click.option("--output_dir", "-o", default=".", help="output directory")
-def copy_template_to_command(output_dir: str):
+def copy_template_to_command(output_dir: str) -> None:
     copy_template(output_dir)
 
 

@@ -1,32 +1,26 @@
-from typing import Optional
+import argparse
+import warnings
+
 import MDAnalysis as mda
 from MDAnalysis.analysis import distances
-import argparse
-
-import warnings
 
 warnings.filterwarnings("ignore")
 
 
-def atom_distance(topology: str, sel1: str, sel2: str, dcd: Optional[str] = None):
-    if dcd is None:
-        u = mda.Universe(topology)
-    else:
-        u = mda.Universe(topology, dcd)
+def atom_distance(topology: str, sel1: str, sel2: str, dcd: str | None = None) -> None:
+    u = mda.Universe(topology) if dcd is None else mda.Universe(topology, dcd)
 
     selected1 = u.select_atoms(sel1)
     selected2 = u.select_atoms(sel2)
 
     if dcd is None:
         _, _, dist = distances.dist(selected1, selected2)
-        print(dist[0])
     else:
-        for ts in u.trajectory:
-            _, _, dist = distances.dist(selected1, selected2)
-            print(ts.time, dist[0])
+        for _ts in u.trajectory:
+            _, _, _dist = distances.dist(selected1, selected2)
 
 
-def atom_distance_to_command():
+def atom_distance_to_command() -> None:
     parser = argparse.ArgumentParser(description="Calculate distance between two atoms")
     parser.add_argument("topology", help="Topology file")
     parser.add_argument("sel1", help="Atom Selection 1")

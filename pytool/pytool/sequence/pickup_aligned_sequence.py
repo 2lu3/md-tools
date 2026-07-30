@@ -1,17 +1,17 @@
 from argparse import ArgumentParser
-from typing import Optional
-from Bio import SeqIO
 from dataclasses import dataclass
+
+from Bio import SeqIO
 
 
 @dataclass
 class Residue:
-    id: Optional[int]
+    id: int | None
     name: str
 
 
 class Sequence:
-    def __init__(self, sequence: str, offset: int):
+    def __init__(self, sequence: str, offset: int) -> None:
         self.sequence = sequence
         self.offset = offset
         self.amino_acids = self._create_amino_acids()
@@ -27,7 +27,7 @@ class Sequence:
                 index += 1
         return amino_acids
 
-    def __str__(self):
+    def __str__(self) -> str:
         dot_count = 0
         for amino_acid in self.amino_acids:
             if amino_acid.name == ".":
@@ -41,7 +41,7 @@ def load_fasta(path: str, ref_index: int, target_index: int):
     return records[ref_index].seq, records[target_index].seq
 
 
-def main():
+def main() -> None:
     parser = ArgumentParser()
     parser.add_argument("input", type=str, help="FASTA file")
     parser.add_argument("--ref-index", type=int, help="参照とする配列のindex.")
@@ -72,5 +72,5 @@ def main():
                 str(ref_sequence.amino_acids[i].id)
             ] = f"{ref_sequence.amino_acids[i].id} {ref_sequence.amino_acids[i].name} {target_sequence.amino_acids[i].id} {target_sequence.amino_acids[i].name}"
 
-    for ref_residue_id in ref_searching_residue_ids:
-        print(result[str(ref_residue_id)])
+    for _ref_residue_id in ref_searching_residue_ids:
+        pass

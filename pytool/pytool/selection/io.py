@@ -1,19 +1,20 @@
+from functools import cache
+
 import MDAnalysis as mda
-from functools import lru_cache
 
 
-def save_residue_selection(residue_selection: str, out_path: str):
+def save_residue_selection(residue_selection: str, out_path: str) -> None:
     with open(out_path, "w") as f:
         f.write(residue_selection)
 
 
-@lru_cache(maxsize=None)
+@cache
 def load_residue_selection(residue_selection_path: str) -> str:
-    with open(residue_selection_path, "r") as f:
+    with open(residue_selection_path) as f:
         return f.read()
 
 
-def illustrate_selection(u: mda.Universe, selection: str, out_path: str):
+def illustrate_selection(u: mda.Universe, selection: str, out_path: str) -> None:
     atoms = u.select_atoms(f"protein and {selection}")
 
     for atom in u.atoms:  # type: ignore

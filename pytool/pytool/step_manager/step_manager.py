@@ -1,5 +1,4 @@
-"""
-step manager
+"""step manager.
 
 期待するプロジェクト構造
 
@@ -21,14 +20,15 @@ step manager
 ├── pyproject.toml
 """
 
+import re
+import shutil
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-import re
-import shutil
 
 import toml
 from alive_progress import alive_bar
+
 
 @dataclass
 class Step:
@@ -59,7 +59,7 @@ class Step:
         return self._project_root / "src" / self._package_name / "template"
 
 class ProjectLayout:
-    """プロジェクトルート・パッケージ名・step ディレクトリの探索と current / previous の解決。
+    """プロジェクトルート・パッケージ名・step ディレクトリの探索と current / previous の解決。.
 
     steps はディレクトリ名の番号（例: 01_foo の 1）をキーとする dict。
     ・0 始まりを仮定しない。
@@ -76,7 +76,8 @@ class ProjectLayout:
         for step in self.steps.values():
             if cwd.is_relative_to(step.src_dir.resolve()):
                 return step
-        raise ValueError(f"Current step not found from cwd: {cwd}")
+        msg = f"Current step not found from cwd: {cwd}"
+        raise ValueError(msg)
 
     def previous_step(self) -> Step:
         previous_idx = self.current_step().idx - 1
@@ -91,14 +92,12 @@ class ProjectLayout:
 
     def _find_package_name(self) -> str:
         # pyproject.toml の [project] セクションの name を取得
-        with open(self.project_root / "pyproject.toml", "r") as f:
+        with open(self.project_root / "pyproject.toml") as f:
             toml_data = toml.load(f)
         return toml_data["project"]["name"]
 
     def _list_steps(self) -> dict[int, Step]:
-        """
-        src/package_name/(number)_(step_name)/ に一致する step ディレクトリを列挙する。
-        """
+        """src/package_name/(number)_(step_name)/ に一致する step ディレクトリを列挙する。."""
         steps: dict[int, Step] = {}
         steps_root = self.project_root / "src" / self.package_name
 
@@ -113,7 +112,8 @@ class ProjectLayout:
             index = int(match.group(1))
             name = match.group(2)
             if steps.get(index) is not None:
-                raise ValueError(f"Step index {index} already exists")
+                msg = f"Step index {index} already exists"
+                raise ValueError(msg)
             steps[index] = Step(
                 idx=index,
                 name=name,
@@ -122,19 +122,21 @@ class ProjectLayout:
             )
 
         if not steps:
-            raise FileNotFoundError(f"Step directories not found in {steps_root}")
+            msg = f"Step directories not found in {steps_root}"
+            raise FileNotFoundError(msg)
 
         return dict(sorted(steps.items()))
 
     def _find_project_root(self, start: Path | None = None) -> Path:
-        """実行時ディレクトリ（または start）から親へ辿り、最初に pyproject.toml があるディレクトリを返す。"""
+        """実行時ディレクトリ（または start）から親へ辿り、最初に pyproject.toml があるディレクトリを返す。."""
         origin = (start or Path.cwd()).resolve()
         p = origin
         while True:
             if (p / "pyproject.toml").is_file():
                 return p
             if p.parent == p:
-                raise FileNotFoundError(f"pyproject.toml not found from {origin}")
+                msg = f"pyproject.toml not found from {origin}"
+                raise FileNotFoundError(msg)
             p = p.parent
 
 
@@ -161,8 +163,7 @@ class StepManager:
 
         with open(current_step.data_dir / ".gitignore", "w") as f:
             f.write("*\n")
-            for non_ignore_file in non_ignore_files:
-                f.write(f"!{non_ignore_file}\n")
+            f.writelines(f"!{non_ignore_file}\n" for non_ignore_file in non_ignore_files)
         with open(current_step.data_dir / ".gitkeep", "w") as f:
             f.write("")
 

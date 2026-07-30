@@ -1,13 +1,14 @@
-import MDAnalysis as mda
-from MDAnalysis.analysis import align
-import click
-from loguru import logger
-
 import warnings
+
+import click
+import MDAnalysis as mda
+from loguru import logger
+from MDAnalysis.analysis import align
+
 warnings.filterwarnings("ignore")
 
 
-def _save_frame(average_structure: align.AverageStructure, start_frame: int, end_frame: int, output_name):
+def _save_frame(average_structure: align.AverageStructure, start_frame: int, end_frame: int, output_name) -> None:
     # Use the AverageStructure class to compute the average
     av = average_structure.run(
         start=start_frame, stop=end_frame, step=1
@@ -23,7 +24,7 @@ def _save_frame(average_structure: align.AverageStructure, start_frame: int, end
 
 def sample_trajectory(
         dcd_path: str, pdb_path: str, output_name: str ="structure", output_num: int=3, window_size: int=10
-):
+) -> None:
     u = mda.Universe(pdb_path, dcd_path)
     average_structure = align.AverageStructure(u, reference=u, ref_frame=0)
     trajectory_num = len(u.trajectory)
@@ -36,7 +37,7 @@ def sample_trajectory(
             output_name + ".pdb",
         )
         return
-    elif output_num == 2:
+    if output_num == 2:
         _save_frame(
             average_structure,
             0,
@@ -80,5 +81,5 @@ def sample_trajectory(
 @click.option("--average_num", "-a", default=10, help="number of average frame")
 def command(
     pdb_path: str, dcd_path: str, output: str, output_num: int, average_num: int
-):
+) -> None:
     sample_trajectory(dcd_path, pdb_path, output, output_num, average_num)

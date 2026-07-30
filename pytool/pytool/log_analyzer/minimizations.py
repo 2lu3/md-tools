@@ -1,10 +1,10 @@
+import os
 from argparse import ArgumentParser
-from typing import Optional
+
+import matplotlib.pyplot as plt
+import numpy as np
 from loguru import logger
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
-import os
-import numpy as np
 
 from .common.log_glob import glob_log_files
 from .common.reader import read_column_by_name
@@ -12,12 +12,12 @@ from .common.reader import read_column_by_name
 
 def analyze_minimizations(
     project_dirs: list[str],
-    project_names: Optional[list[str]] = None,
+    project_names: list[str] | None = None,
     use_moving_average: bool = False,
     window_size: int = 10,
     figsize: tuple[int, int] = (12, 6),
 ) -> Figure:
-    """各種グラフを複数のプロジェクトを統合して描画する
+    """各種グラフを複数のプロジェクトを統合して描画する.
 
     Args:
         project_dirs (list[str]): project_dirs
@@ -26,7 +26,6 @@ def analyze_minimizations(
     Returns:
         Figure:
     """
-
     if project_names is None:
         project_names = [os.path.basename(os.path.normpath(project_dir)) for project_dir in project_dirs]
     steps: list[list[int]] = []
@@ -48,7 +47,7 @@ def analyze_minimizations(
     fig: Figure = plt.figure(figsize=figsize)
     ax_all = fig.add_subplot(121)
 
-    for name, step, potential_energy in zip(project_names, steps, potential_energies):
+    for name, step, potential_energy in zip(project_names, steps, potential_energies, strict=False):
         ax_all.plot(step, potential_energy, label=name)
 
         if use_moving_average:
@@ -68,7 +67,7 @@ def analyze_minimizations(
     ax_all.legend()
 
     ax_half = fig.add_subplot(122)
-    for name, step, potential_energy in zip(project_names, steps, potential_energies):
+    for name, step, potential_energy in zip(project_names, steps, potential_energies, strict=False):
         half_index = len(step) // 2
         step = step[half_index:]
         potential_energy = potential_energy[half_index:]
@@ -96,7 +95,7 @@ def analyze_minimizations(
     return fig
 
 
-def command():
+def command() -> None:
     parser = ArgumentParser()
     parser.add_argument("project_dirs", nargs="+", type=str)
     parser.add_argument("--figsize", type=int, nargs=2, default=[12, 6])
@@ -110,7 +109,7 @@ def command():
         None,
         args.use_moving_average,
         args.window_size,
-        tuple([args.figsize[0], args.figsize[1]]),
+        (args.figsize[0], args.figsize[1]),
     )
     fig.savefig(args.out)
 

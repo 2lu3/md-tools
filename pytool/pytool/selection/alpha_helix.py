@@ -1,6 +1,7 @@
+import warnings
+
 import MDAnalysis as mda
 from MDAnalysis.analysis.dssp import DSSP, translate
-import warnings
 
 warnings.filterwarnings("ignore")
 
@@ -10,27 +11,27 @@ def _persistent_ss(u: mda.Universe, threshold):
     persistent_residues = translate(
         long_run.results.dssp_ndarray.mean(axis=0) > threshold
     )
-    persistent_ss = "".join(persistent_residues)
+    return "".join(persistent_residues)
 
-    return persistent_ss
 
 
 def _ss(u: mda.Universe):
     dssp = DSSP(u)
     long_run = dssp.run()
-    ss = long_run.results.dssp[0]
+    return long_run.results.dssp[0]
 
-    return ss
 
 
 def _merge_ss(ss_list: list[str], method: str):
     if not ss_list:
-        raise ValueError("ss_list must not be empty")
+        msg = "ss_list must not be empty"
+        raise ValueError(msg)
 
     # all ss should be same length
     ss_length_list = [len(ss) for ss in ss_list]
     if len(set(ss_length_list)) != 1:
-        raise ValueError("All secondary structures should be same length")
+        msg = "All secondary structures should be same length"
+        raise ValueError(msg)
     ss_length = ss_length_list[0]
 
     merged_ss = ""
@@ -52,11 +53,13 @@ def _merge_ss(ss_list: list[str], method: str):
     return merged_ss
 
 
-def select_alpha_helix(u_list: list[mda.Universe], method: str,threshold: float = 0.8):
+def select_alpha_helix(u_list: list[mda.Universe], method: str,threshold: float = 0.8) -> str:
     if not u_list:
-        raise ValueError("u_list must not be empty")
+        msg = "u_list must not be empty"
+        raise ValueError(msg)
     if not (0.0 <= threshold <= 1.0):
-        raise ValueError("threshold must be in [0.0, 1.0]")
+        msg = "threshold must be in [0.0, 1.0]"
+        raise ValueError(msg)
 
     ss_list = []
     for u in u_list:
@@ -70,16 +73,17 @@ def select_alpha_helix(u_list: list[mda.Universe], method: str,threshold: float 
     # DSSP assigns states to protein residues, so align against protein-only order.
     protein_residues = u.select_atoms("protein").residues  # type: ignore
     if len(protein_residues) != len(merged_ss):
+        msg = "DSSP residue count does not match protein residues in the universe"
         raise ValueError(
-            "DSSP residue count does not match protein residues in the universe"
+            msg
         )
 
-    for res, ss in zip(protein_residues, merged_ss):
+    for res, ss in zip(protein_residues, merged_ss, strict=False):
         if ss == "H":
             alpha_helix_residues.append(res.resid)
 
     if not alpha_helix_residues:
-        raise ValueError("No alpha-helix residues found")
+        msg = "No alpha-helix residues found"
+        raise ValueError(msg)
 
-    selection = f"(resid {' '.join(map(str, alpha_helix_residues))})"
-    return selection
+    return f"(resid {' '.join(map(str, alpha_helix_residues))})"

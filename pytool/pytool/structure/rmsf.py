@@ -1,8 +1,7 @@
-from MDAnalysis.analysis.rms import RMSF
 import MDAnalysis as mda
-from MDAnalysis.analysis.align import AlignTraj
 import MDAnalysis.transformations as trans
-
+from MDAnalysis.analysis.align import AlignTraj
+from MDAnalysis.analysis.rms import RMSF
 
 
 def rmsf(u: mda.Universe, selection: str):
@@ -21,7 +20,7 @@ def rmsf(u: mda.Universe, selection: str):
 
     ref_coords = u.trajectory.timeseries(asel=selection).mean(axis=1)
 
-    reference = mda.Merge(selected).load_new(ref_coords[:, None, :], order="afc")
+    mda.Merge(selected).load_new(ref_coords[:, None, :], order="afc")
 
     rmsf = RMSF(selected, verbose=True).run()
 

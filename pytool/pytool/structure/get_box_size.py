@@ -1,9 +1,10 @@
-from typing import Union
-import MDAnalysis as mda
-import click
 
-def get_box_size(u: Union[mda.Universe, str]) -> tuple[float, float, float]:
-    """Get box size from a universe
+import click
+import MDAnalysis as mda
+
+
+def get_box_size(u: mda.Universe | str) -> tuple[float, float, float]:
+    """Get box size from a universe.
 
     Args:
         u (mda.Universe): A universe
@@ -12,7 +13,7 @@ def get_box_size(u: Union[mda.Universe, str]) -> tuple[float, float, float]:
         tuple[float, float, float]: Box size in x, y, z
     """
     def get_box_size_from_atoms(atoms: mda.AtomGroup):
-        """Get box size from atoms
+        """Get box size from atoms.
 
         Args:
             atoms (mda.AtomGroup): Atoms
@@ -37,12 +38,11 @@ def get_box_size(u: Union[mda.Universe, str]) -> tuple[float, float, float]:
 
 @click.command()
 @click.argument("input_pdb", type=click.Path(exists=True))
-def get_box_size_to_command(input_pdb: str):
+def get_box_size_to_command(input_pdb: str) -> None:
     u = mda.Universe(input_pdb)
 
-    boxsize = get_box_size(u)
+    get_box_size(u)
 
 
-    print(f"{boxsize[0]} {boxsize[1]} {boxsize[2]}")
 
 

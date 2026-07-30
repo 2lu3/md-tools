@@ -1,13 +1,11 @@
-from typing import Optional
+
 import pandas as pd
 from matplotlib import pyplot as plt
-
-from .reader import read_column_by_name, read_log
 
 
 def plot_box_sizes(
     df_list: list[pd.DataFrame], condition_names: list[str], output_path: str
-):
+) -> None:
     fig = plt.figure()
 
     for i, (label, column_name) in enumerate(
@@ -15,10 +13,10 @@ def plot_box_sizes(
     ):
         ax = fig.add_subplot(3, 1, i + 1)
         ax.set_xlabel("Time (ps)")
-        ax.set_ylabel(f"Box size (Å)")
+        ax.set_ylabel("Box size (Å)")
         ax.set_title(f"Box size {label}")
 
-        for condition_name, df in zip(condition_names, df_list):
+        for condition_name, df in zip(condition_names, df_list, strict=False):
             x = df["TIME"]
             y = df[column_name]
             ax.plot(x, y, label=condition_name)
@@ -33,14 +31,14 @@ def plot_pressure(
     df_list: list[pd.DataFrame],
     condition_names: list[str],
     output_path: str,
-    window_size: Optional[int] = None,
-):
+    window_size: int | None = None,
+) -> None:
     fig, ax = plt.subplots()
     ax.set_xlabel("Time (ps)")
     ax.set_ylabel("Pressure (bar)")
     ax.set_title("Pressure")
 
-    for condition_name, df in zip(condition_names, df_list):
+    for condition_name, df in zip(condition_names, df_list, strict=False):
         time = (
             df["TIME"]
             if window_size is None
@@ -62,14 +60,14 @@ def plot_temperature(
     df_list: list[pd.DataFrame],
     condition_names: list[str],
     output_path: str,
-    window_size: Optional[int] = None,
-):
+    window_size: int | None = None,
+) -> None:
     fig, ax = plt.subplots()
     ax.set_xlabel("Time (ps)")
     ax.set_ylabel("Temperature (K)")
     ax.set_title("Temperature")
 
-    for condition_name, df in zip(condition_names, df_list):
+    for condition_name, df in zip(condition_names, df_list, strict=False):
         time = (
             df["TIME"]
             if window_size is None
@@ -91,15 +89,15 @@ def plot_potential_energy(
     df_list: list[pd.DataFrame],
     condition_names: list[str],
     output_path: str,
-    window_size: Optional[int] = None,
-):
+    window_size: int | None = None,
+) -> None:
 
     fig, ax = plt.subplots()
     ax.set_xlabel("Time (ps)")
     ax.set_ylabel("Potential Energy (kJ/mol)")
     ax.set_title("Potential Energy")
 
-    for condition_name, df in zip(condition_names, df_list):
+    for condition_name, df in zip(condition_names, df_list, strict=False):
         time = (
             df["TIME"]
             if window_size is None
@@ -121,14 +119,14 @@ def plot_total_energy(
     df_list: list[pd.DataFrame],
     condition_names: list[str],
     output_path: str,
-    window_size: Optional[int] = None,
-):
+    window_size: int | None = None,
+) -> None:
     fig, ax = plt.subplots()
     ax.set_xlabel("Time (ps)")
     ax.set_ylabel("Total Energy (kJ/mol)")
     ax.set_title("Total Energy")
 
-    for condition_name, df in zip(condition_names, df_list):
+    for condition_name, df in zip(condition_names, df_list, strict=False):
         total_energy = (
             df["TOTAL_ENE"]
             if window_size is None

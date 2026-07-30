@@ -49,6 +49,7 @@ install_genesis_requirements = "pytool.useful_commands.genesis:install_genesis_r
 dev = [
     "black>=23.7.0,<24.0.0",
     "pytest>=7.4.0,<8.0.0",
+    "ruff>=0.16.0",
 ]
 
 [build-system]
@@ -57,3 +58,35 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["pytool"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+src = ["pytool", "tests"]
+extend-exclude = [
+    "pytool/config/template",
+    "pytool/command/template",
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "COM812", # trailing-comma conflicts with formatter
+    "ISC001", # implicit-str-concat conflicts with formatter
+    "D203",   # conflicts with D211
+    "D213",   # conflicts with D212
+    "CPY001", # copyright notice managed via LICENSE
+    "N813",   # MDAnalysis is conventionally imported as mda
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+    "S101",   # assert is expected in tests
+    "INP001", # test files are not packages
+    "D",      # docstring noise in tests
+    "ANN",    # type annotations optional in tests
+    "ERA001", # commented scaffolding in unfinished tests
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

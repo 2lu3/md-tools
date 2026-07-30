@@ -1,10 +1,11 @@
+import argparse
+
 import MDAnalysis as mda
 import numpy as np
-import argparse
 from loguru import logger
 
 
-def moving_average(pdb: str, dcd: str, window: int, out_dcd: str):
+def moving_average(pdb: str, dcd: str, window: int, out_dcd: str) -> None:
     logger.info(f"Calculating moving average with window size {window}")
     u = mda.Universe(pdb, dcd)
 
@@ -26,7 +27,7 @@ def moving_average(pdb: str, dcd: str, window: int, out_dcd: str):
             writer.write(u.atoms)
 
 
-def moving_average_to_command():
+def moving_average_to_command() -> None:
     parser = argparse.ArgumentParser(
         description="Calculate a moving average of a DCD file"
     )
