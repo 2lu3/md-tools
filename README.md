@@ -1,28 +1,24 @@
 # md-tools
 
-This repository contains some useful tools to perform molecular dynamics simulation.
+Hub repository for molecular dynamics tooling. The packages formerly
+hosted here now live in their own repositories:
 
-## pytool
+| Package | Repository | Install |
+|---------|------------|---------|
+| **dit** | [2lu3/dit](https://github.com/2lu3/dit) | `pip install git+https://github.com/2lu3/dit.git` |
+| **pytool** | [2lu3/pytool](https://github.com/2lu3/pytool) | `pip install git+https://github.com/2lu3/pytool.git` |
 
-```
-pip install git+https://github.com/2lu3/md-tools.git#subdirectory=pytool
-pip install git+https://github.com/2lu3/md-tools.git#subdirectory=dit
-```
+## Migration notes
 
-## dit
-
-MD 向けの大容量ファイル版管理（DVC 非依存）。詳細は [dit/README.md](dit/README.md)。
+Old subdirectory installs no longer apply after this split:
 
 ```bash
+# deprecated
 pip install git+https://github.com/2lu3/md-tools.git#subdirectory=dit
-
-dit init --remote-url s3://bucket/prefix --endpoint-url https://minio.example.com
-# edit dit.toml [track].patterns as needed
-dit scope add data/07_production
-dit sync
+pip install git+https://github.com/2lu3/md-tools.git#subdirectory=pytool
 ```
 
-`git commit` 時に pre-commit フックが `dit add` を実行し、`*.dit` ポインタを自動ステージする。
+Use the repository URLs above instead.
 
 ## .env and .envrc
 
