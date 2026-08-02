@@ -1,28 +1,45 @@
-from argparse import ArgumentParser
-from glob import glob
-from itertools import cycle
-import os
-from matplotlib.pyplot import cm
-import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
-from natsort import natsorted
-import numpy as np
-from dataclasses import dataclass
+"""Analyze equilibration runs across multiple projects."""
 
+from argparse import ArgumentParser
+from dataclasses import dataclass
+from itertools import cycle
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.figure import Figure
+from matplotlib.pyplot import cm
+from natsort import natsorted
+
+from .common.fig_by_column import fig_by_column
 from .common.log_glob import glob_log_files
 from .common.reader import read_log
-from .common.fig_by_column import fig_by_column
 
 linestyles = ["-", "--", "-.", ":"]
 
-def analyze_box_sizes(
+
+def analyze_box_sizes(  # noqa: C901, PLR0912
     project_dirs: list[str],
+    *,
     use_moving_average: bool = False,
     window_size: int = 10,
     figsize: tuple[int, int] = (12, 6),
-):
+) -> Figure:
+    """Plot box size values across multiple projects.
+
+    Args:
+        project_dirs: Project directories or log files to analyze.
+        use_moving_average: Whether to plot a moving average.
+        window_size: Moving average window size.
+        figsize: Figure size in inches.
+
+    Returns:
+        Box size comparison figure.
+    """
     @dataclass
     class Data:
+        """Box size data grouped by project and log file."""
+
         project_name: str
         time: dict[str, list[int]]
         x: dict[str, list[float]]
@@ -32,7 +49,7 @@ def analyze_box_sizes(
     data_list: list[Data] = []
     for project_dir in project_dirs:
         data = Data(
-            project_name=os.path.basename(os.path.normpath(project_dir)),
+            project_name=Path(project_dir).name,
             time={},
             x={},
             y={},
@@ -44,7 +61,7 @@ def analyze_box_sizes(
             if "BOXX" not in df.columns:
                 continue
 
-            log_name = os.path.basename(os.path.normpath(log_file))
+            log_name = Path(log_file).name
             time = list(map(int, df["TIME"]))
             x = list(map(float, df["BOXX"]))
             y = list(map(float, df["BOXY"]))
@@ -59,9 +76,9 @@ def analyze_box_sizes(
 
     data_list = sorted(data_list, key=lambda x: x.project_name)
 
-    file_names = set(
-        [file_name for data in data_list for file_name in data.time.keys()]
-    )
+    file_names = {
+        file_name for data in data_list for file_name in data.time
+    }
     file_names = natsorted(file_names)
 
     fig = plt.figure(figsize=figsize, constrained_layout=True)
@@ -72,7 +89,17 @@ def analyze_box_sizes(
             ax = fig.add_subplot(3, len(file_names), index)
             index += 1
             cmap = cm.get_cmap("tab20c")
-            ax.set_prop_cycle(color=[cmap(i) for i in np.linspace(0, 1, len(data_list) // len(linestyles) + 1) for _ in range(len(linestyles)) ])
+            ax.set_prop_cycle(
+                color=[
+                    cmap(color_index)
+                    for color_index in np.linspace(
+                        0,
+                        1,
+                        len(data_list) // len(linestyles) + 1,
+                    )
+                    for _ in range(len(linestyles))
+                ]
+            )
             linestyle_cycler = cycle(linestyles)
 
             ax.set_title(f"{file_name} {dim}")
@@ -80,7 +107,7 @@ def analyze_box_sizes(
             ax.set_ylabel("Box Size (nm)")
 
             for data in data_list:
-                if file_name in data.time.keys():
+                if file_name in data.time:
                     if dim == "X":
                         y = data.x
                     elif dim == "Y":
@@ -88,7 +115,8 @@ def analyze_box_sizes(
                     elif dim == "Z":
                         y = data.z
                     else:
-                        raise ValueError(f"Invalid dimension {dim}")
+                        msg = f"Invalid dimension {dim}"
+                        raise ValueError(msg)
 
                     if use_moving_average:
                         moving_average_x = np.convolve(
@@ -125,75 +153,72 @@ def analyze_box_sizes(
 
 def analyze_equilibrations(
     project_dirs: list[str],
+    *,
     use_moving_average: bool = False,
     window_size: int = 10,
     figsize: tuple[int, int] = (12, 6),
 ) -> list[tuple[str, Figure]]:
-    """analyze_equilibrations.
+    """Plot equilibration values across multiple projects.
 
-    以下のグラフを作成する
-    * 全エネルギー
-    * ポテンシャルエネルギー
-    * 運動エネルギー
-    * 温度
-    * 格子サイズ
-    * 圧力
-
+    Creates total energy, potential energy, kinetic energy, temperature,
+    box size, and pressure figures.
 
     Args:
-        project_dirs (list[str]): project_dirs
-        use_moving_average (bool): use_moving_average
-        window_size (int): window_size
-        figsize (tuple[int, int]): figsize
+        project_dirs: Project directories or log files to analyze.
+        use_moving_average: Whether to plot a moving average.
+        window_size: Moving average window size.
+        figsize: Figure size in inches.
 
     Returns:
-        Figure:
+        Named equilibration comparison figures.
     """
-
     fig_total_energy = fig_by_column(
         project_dirs,
         "TOTAL_ENE",
         "Total Energy (KJ/mol)",
-        use_moving_average,
-        window_size,
-        figsize,
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
     )
     fig_potential_energy = fig_by_column(
         project_dirs,
         "POTENTIAL_ENE",
         "Potential Energy (KJ/mol)",
-        use_moving_average,
-        window_size,
-        figsize,
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
     )
     fig_kinetic_energy = fig_by_column(
         project_dirs,
         "KINETIC_ENE",
         "Kinetic Energy (KJ/mol)",
-        use_moving_average,
-        window_size,
-        figsize,
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
     )
     fig_temperature = fig_by_column(
         project_dirs,
         "TEMPERATURE",
         "Temperature (K)",
-        use_moving_average,
-        window_size,
-        figsize,
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
     )
 
     fig_box_sizes = analyze_box_sizes(
-        project_dirs, use_moving_average, window_size, figsize
+        project_dirs,
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
     )
 
     fig_pressure = fig_by_column(
         project_dirs,
         "PRESSURE",
         "Pressure (bar)",
-        use_moving_average,
-        window_size,
-        figsize,
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
     )
 
     return [
@@ -206,7 +231,8 @@ def analyze_equilibrations(
     ]
 
 
-def command():
+def command() -> None:
+    """Run multi-project equilibration analysis from the command line."""
     parser = ArgumentParser()
     parser.add_argument("--project_dirs", nargs="+", type=str, default=None)
     parser.add_argument("--root-dir", type=str, default=None)
@@ -216,18 +242,20 @@ def command():
     parser.add_argument("--use-moving-average", action="store_true")
     args = parser.parse_args()
 
-    assert args.project_dirs is not None or args.root_dir is not None
+    if args.project_dirs is None and args.root_dir is None:
+        msg = "Either project_dirs or root_dir must be provided"
+        raise ValueError(msg)
 
     if args.project_dirs is None:
-        dirs = glob(os.path.join(args.root_dir, "*/"))
+        dirs = [str(project_dir) for project_dir in Path(args.root_dir).glob("*/")]
     else:
         dirs = args.project_dirs
 
     figs = analyze_equilibrations(
         dirs,
-        args.use_moving_average,
-        args.window_size,
-        args.figsize,
+        use_moving_average=args.use_moving_average,
+        window_size=args.window_size,
+        figsize=args.figsize,
     )
     for name, fig in figs:
         fig.savefig(f"{args.out_name}_{name}.png")

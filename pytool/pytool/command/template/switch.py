@@ -1,14 +1,16 @@
 #!/usr/env/bin python3
 
 import glob
-from argparse import ArgumentParser
 import subprocess
+from argparse import ArgumentParser
+
 from loguru import logger
+
 
 def glob_genesis_dirs():
     return glob.glob("genesis*/")
 
-def main(model: str):
+def main(model: str) -> None:
     dirs = glob_genesis_dirs()
 
     for d in dirs:

@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-import re
 import glob
 import os
-from dataclasses import dataclass, field
-from typing import Optional
+import re
+
 from loguru import logger
 
 
 class Result:
-    def __init__(self, dir_path: str, name: str, node: int, proc: int, thread: int):
+    def __init__(self, dir_path: str, name: str, node: int, proc: int, thread: int) -> None:
         self.dir_path: str = dir_path
         self.name: str = name
         self.node: int = node
@@ -30,19 +29,21 @@ class Result:
     def dynamics_time(self):
         for log_file in self._gather_log_files():
             with open(log_file) as f:
-                for line in f.readlines():
+                for line in f:
                     if "dynamics" in line:
                         return float(line.split("=")[1])
-        raise RuntimeError("Could not find dynamics time")
+        msg = "Could not find dynamics time"
+        raise RuntimeError(msg)
 
     @property
     def nsteps(self):
         for log_file in self._gather_log_files():
             with open(log_file) as f:
-                for line in f.readlines():
+                for line in f:
                     if "nsteps" in line:
                         return int(line.strip().split("=")[-1])
-        raise RuntimeError("Could not find nsteps")
+        msg = "Could not find nsteps"
+        raise RuntimeError(msg)
 
     @property
     def core_efficiency(self):
@@ -60,8 +61,7 @@ class Result:
 
 
     def _gather_log_files(self):
-        files = glob.glob(os.path.join(self.dir_path, "out", "*.log*"))
-        return files
+        return glob.glob(os.path.join(self.dir_path, "out", "*.log*"))
 
 
 def glob_benchmarks(projects_root_path: str):
@@ -81,12 +81,12 @@ def glob_benchmarks(projects_root_path: str):
                 )
             )
         else:
-            print(f"Skipping {directory} because it does not match the pattern")
+            pass
 
     return results
 
 
-def analyze_benchmark(projects_root_path: str):
+def analyze_benchmark(projects_root_path: str) -> None:
     logger.info(f"benchmark dir: {projects_root_path}/benchmarks")
 
     results: list[Result] = []
@@ -96,23 +96,14 @@ def analyze_benchmark(projects_root_path: str):
             continue
         results.append(result)
 
-    for name in set([result.name for result in results]):
+    for name in {result.name for result in results}:
         grouped_results = [result for result in results if result.name == name]
 
         grouped_results.sort(key=lambda x: x.core_efficiency, reverse=True)
 
         # print in markdown table format with aligned for bash output
-        print(f"## {name}")
-        print(
-            "| node | proc | thread | total time | nstep/sec | eff(node) | eff(core) |"
-        )
-        print(
-            "|------|------|--------|------------|-----------|-----------|-----------|"
-        )
         for result in grouped_results:
-            print(
-                f"| {result.node:4d} | {result.proc:4d} | {result.thread:6d} | {result.dynamics_time:10.2f} | {result.nstep_per_sec:9.2f} | {result.node_efficiency:9.2f} | {result.core_efficiency:9.2f} |"
-                    )
+            pass
 
 if __name__ == "__main__":
     analyze_benchmark("benchmarks")

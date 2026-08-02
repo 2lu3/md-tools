@@ -1,6 +1,8 @@
+"""Analyze production runs across multiple projects."""
+
 from argparse import ArgumentParser
-from glob import glob
-import os
+from pathlib import Path
+
 from matplotlib.figure import Figure
 
 from .common.fig_by_column import fig_by_column
@@ -8,55 +10,66 @@ from .common.fig_by_column import fig_by_column
 
 def analyze_productions(
     project_dirs: list[str],
+    *,
     use_moving_average: bool = False,
     window_size: int = 10,
     figsize: tuple[int, int] = (12, 6),
-    ) -> list[tuple[str, Figure]]:
+) -> list[tuple[str, Figure]]:
+    """Plot production values across multiple projects.
 
+    Args:
+        project_dirs: Project directories or log files to analyze.
+        use_moving_average: Whether to plot a moving average.
+        window_size: Moving average window size.
+        figsize: Figure size in inches.
+
+    Returns:
+        Named production comparison figures.
+    """
     fig_total_energy = fig_by_column(
-            project_dirs,
-            "TOTAL_ENE",
-            "Total Energy (KJ/mol)",
-            use_moving_average,
-            window_size,
-            figsize,
-            )
+        project_dirs,
+        "TOTAL_ENE",
+        "Total Energy (KJ/mol)",
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
+    )
 
     fig_potential_energy = fig_by_column(
-            project_dirs,
-            "POTENTIAL_ENE",
-            "Potential Energy (KJ/mol)",
-            use_moving_average,
-            window_size,
-            figsize,
-            )
+        project_dirs,
+        "POTENTIAL_ENE",
+        "Potential Energy (KJ/mol)",
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
+    )
 
     fig_kinetic_energy = fig_by_column(
-            project_dirs,
-            "KINETIC_ENE",
-            "Kinetic Energy (KJ/mol)",
-            use_moving_average,
-            window_size,
-            figsize,
-            )
+        project_dirs,
+        "KINETIC_ENE",
+        "Kinetic Energy (KJ/mol)",
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
+    )
 
     fig_temperature = fig_by_column(
-            project_dirs,
-            "TEMPERATURE",
-            "Temperature (K)",
-            use_moving_average,
-            window_size,
-            figsize,
-            )
+        project_dirs,
+        "TEMPERATURE",
+        "Temperature (K)",
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
+    )
 
     fig_pressure = fig_by_column(
-            project_dirs,
-            "PRESSURE",
-            "Pressure (bar)",
-            use_moving_average,
-            window_size,
-            figsize,
-            )
+        project_dirs,
+        "PRESSURE",
+        "Pressure (bar)",
+        use_moving_average=use_moving_average,
+        window_size=window_size,
+        figsize=figsize,
+    )
 
     return [
         ("total_energy", fig_total_energy),
@@ -67,7 +80,8 @@ def analyze_productions(
     ]
 
 
-def command():
+def command() -> None:
+    """Run multi-project production analysis from the command line."""
     parser = ArgumentParser()
     parser.add_argument("--project_dirs", nargs="+", type=str, default=None)
     parser.add_argument("--root-dir", type=str, default=None)
@@ -78,18 +92,20 @@ def command():
 
     args = parser.parse_args()
 
-    assert args.project_dirs is not None or args.root_dir is not None, "Either project_dirs or root_dir must be provided"
+    if args.project_dirs is None and args.root_dir is None:
+        msg = "Either project_dirs or root_dir must be provided"
+        raise ValueError(msg)
 
     if args.project_dirs is None:
-        dirs = glob(os.path.join(args.root_dir, "*/"))
+        dirs = [str(project_dir) for project_dir in Path(args.root_dir).glob("*/")]
     else:
-        dirs = [os.path.abspath(project_dir) for project_dir in args.project_dirs]
+        dirs = [str(Path(project_dir).resolve()) for project_dir in args.project_dirs]
 
     figs = analyze_productions(
         dirs,
-        args.use_moving_average,
-        args.window_size,
-        args.figsize,
+        use_moving_average=args.use_moving_average,
+        window_size=args.window_size,
+        figsize=args.figsize,
     )
 
     for name, fig in figs:

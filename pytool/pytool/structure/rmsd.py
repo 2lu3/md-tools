@@ -1,14 +1,26 @@
-import click
-import MDAnalysis as mda
-from MDAnalysis.analysis import rms
-import matplotlib.pyplot as plt
+"""Calculate and plot RMSD values."""
 
 import warnings
+
+import click
+import matplotlib.pyplot as plt
+import MDAnalysis as mda
+from MDAnalysis.analysis import rms
 
 warnings.filterwarnings("ignore", "DCDReader currently makes independent timesteps")
 
 
 def rmsd(u: mda.Universe, ref: mda.Universe, select: str = "protein") -> float:
+    """Calculate RMSD between two universes.
+
+    Args:
+        u: Mobile universe.
+        ref: Reference universe.
+        select: Atom selection used for RMSD.
+
+    Returns:
+        RMSD value.
+    """
     u_selected = u.select_atoms(select)
     ref_selected = ref.select_atoms(select)
 
@@ -21,49 +33,64 @@ def rmsd(u: mda.Universe, ref: mda.Universe, select: str = "protein") -> float:
 
 
 def rmsd_trajectory(
-    u: mda.Universe, ref: mda.Universe, select="protein"
+    u: mda.Universe,
+    ref: mda.Universe,
+    select: str = "protein",
 ) -> tuple[list[float], list[float]]:
-    R = rms.RMSD(
+    """Calculate RMSD over a trajectory.
+
+    Args:
+        u: Mobile universe with trajectory.
+        ref: Reference universe.
+        select: Atom selection used for RMSD.
+
+    Returns:
+        Time and RMSD arrays.
+    """
+    rmsd_calculator = rms.RMSD(
         u,
         ref,
         select=select,
         verbose=True,
     )
 
-    R.run()
+    rmsd_calculator.run()
 
-    result = R.results.rmsd.T
+    result = rmsd_calculator.results.rmsd.T
     time = result[1]
-    rmsd = result[2]
-    return time, rmsd
+    rmsd_values = result[2]
+    return time, rmsd_values
 
 
 @click.command()
 @click.argument("toplogy1", type=click.Path(exists=True))
 @click.argument("toplogy2", type=click.Path(exists=True))
 @click.option("--select", default="protein", help="RMSDを計算する構造を指定する")
-def rmsd_to_command(toplogy1: str, toplogy2: str, select: str):
-    u = mda.Universe(toplogy1)
-    ref = mda.Universe(toplogy2)
-
-    print(rmsd(u, ref, select=select))
-
+def rmsd_to_command(toplogy1: str, toplogy2: str, select: str) -> None:
+    """Run the rmsd command."""
+    rmsd(mda.Universe(toplogy1), mda.Universe(toplogy2), select=select)
 
 @click.command()
 @click.argument("toplogy1", type=click.Path(exists=True))
 @click.argument("toplogy2", type=click.Path(exists=True))
 @click.option("--select", default="protein", help="RMSDを計算する構造を指定する")
 @click.option("--picture", default="rmsd.png", help="出力画像ファイル名")
-def rmsd_trajectory_to_command(toplogy1: str, toplogy2: str, select: str, picture: str):
+def rmsd_trajectory_to_command(
+    toplogy1: str,
+    toplogy2: str,
+    select: str,
+    picture: str,
+) -> None:
+    """Run the rmsd-trajectory command."""
     u = mda.Universe(toplogy1)
     ref = mda.Universe(toplogy2)
 
-    time, rmsd = rmsd_trajectory(u, ref, select=select)
+    time, rmsd_values = rmsd_trajectory(u, ref, select=select)
 
-    fig: plt.Figure = plt.figure()  # type: ignore
+    fig = plt.figure()
     ax = fig.add_subplot(111)
 
-    ax.plot(time, rmsd, label="all")
+    ax.plot(time, rmsd_values, label="all")
     ax.legend(loc="best")
     ax.set_xlabel("time (ps)")
     ax.set_ylabel(r"RMSD ($\AA$)")
